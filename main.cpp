@@ -107,6 +107,11 @@ void goBack()
         char backRo[] = "Inapoi";
         drawButton(getmaxx()-150, getmaxy()-80, 3, WHITE, itsBg, backRo);
     }
+    else if (lang == 3)
+    {
+        char backFr[] = "Revenir";
+        drawButton(getmaxx()-150, getmaxy()-80, 3, WHITE, itsBg, backFr);
+    }
 }
 
 bool checkClick(short x, short y, short x1, short x2, short y1, short y2)
@@ -385,6 +390,11 @@ void initMenu()
         char titleRo[] = "JOC BONOL";
         outtextxy(69, 69, titleRo);
     }
+    else if (lang == 3)
+    {
+        char titleFr[] = "JEU BONOL";
+        outtextxy(69, 69, titleFr);
+    }
 
     // adds an image to the menu
     readimagefile("bonol_main.jpg", getmaxx()/1.6, getmaxy()/4, getmaxx()/3, -getmaxy()/4);
@@ -403,6 +413,11 @@ void initMenu()
         char copyrightRo[] = "Creat cu <3 de catre Nicolae Alexandrescu & Valentin Tean";
         outtextxy(getmaxx()-720, getmaxy()-65, copyrightRo);
     }
+    else if (lang == 3)
+    {
+        char copyrightFr[] = "Développé avec <3 par Nicolae Alexandrescu & Valentin Tean";
+        outtextxy(getmaxx()-720, getmaxy()-65, copyrightFr);
+    }
 }
 
 void initButtons()
@@ -411,6 +426,7 @@ void initButtons()
     // play button
     char playEn[] = "PLAY";
     char playRo[] = "JOACA";
+    char playFr[] = "JOUER";
     if (checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+105, getmaxy()/2-130, getmaxy()/2-90))
     {
         if (lang == 1)
@@ -420,6 +436,10 @@ void initButtons()
         else if (lang == 2)
         {
             drawButton(getmaxx()/10, getmaxy()/2-130, 5, itsYellow, itsBg, playRo);
+        }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/10, getmaxy()/2-130, 5, itsYellow, itsBg, playFr);
         }
     }
     else
@@ -432,6 +452,10 @@ void initButtons()
         {
             drawButton(getmaxx()/10, getmaxy()/2-130, 5, itsBg, itsYellow, playRo);
         }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/10, getmaxy()/2-130, 5, itsBg, itsYellow, playFr);
+        }
     }
 
     // options button
@@ -439,7 +463,7 @@ void initButtons()
     char optionsRo[] = "OPTIUNI";
     if (checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+182, getmaxy()/2-60, getmaxy()/2-20))
     {
-        if (lang == 1)
+        if (lang == 1 || lang == 3)
         {
             drawButton(getmaxx()/10, getmaxy()/2-60, 5, itsYellow, itsBg, optionsEn);
         }
@@ -450,7 +474,7 @@ void initButtons()
     }
     else
     {
-        if (lang == 1)
+        if (lang == 1 || lang == 3)
         {
             drawButton(getmaxx()/10, getmaxy()/2-60, 5, itsBg, itsYellow, optionsEn);
         }
@@ -461,11 +485,11 @@ void initButtons()
     }
 
     // game info button
-    char infoEn[] = "GAME INFO";
+    char infoEn[] = "INFORMATIONS";
     char infoRo[] = "INFORMATII";
-    if (checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+232, getmaxy()/2+10, getmaxy()/2+50))
+    if (checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+310, getmaxy()/2+10, getmaxy()/2+50))
     {
-        if (lang == 1)
+        if (lang == 1 || lang == 3)
         {
             drawButton(getmaxx()/10, getmaxy()/2+10, 5, itsYellow, itsBg, infoEn);
         }
@@ -476,7 +500,7 @@ void initButtons()
     }
     else
     {
-        if (lang == 1)
+        if (lang == 1 || lang == 3)
         {
             drawButton(getmaxx()/10, getmaxy()/2+10, 5, itsBg, itsYellow, infoEn);
         }
@@ -487,9 +511,10 @@ void initButtons()
     }
 
     // exit button
-    char exitEn[] = "EXIT";
-    char exitRo[] = "IESI";
-    if (checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+102, getmaxy()/2+80, getmaxy()/2+120))
+    char exitEn[] = "EXIT GAME";
+    char exitRo[] = "IESIRE";
+    char exitFr[] = "SORTIE";
+    if (checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+232, getmaxy()/2+80, getmaxy()/2+120))
     {
         if (lang == 1)
         {
@@ -498,6 +523,10 @@ void initButtons()
         else if (lang == 2)
         {
             drawButton(getmaxx()/10, getmaxy()/2+80, 5, itsYellow, itsBg, exitRo);
+        }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/10, getmaxy()/2+80, 5, itsYellow, itsBg, exitFr);
         }
     }
     else
@@ -509,6 +538,10 @@ void initButtons()
         else if (lang == 2)
         {
             drawButton(getmaxx()/10, getmaxy()/2+80, 5, itsBg, itsYellow, exitRo);
+        }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/10, getmaxy()/2+80, 5, itsBg, itsYellow, exitFr);
         }
     }
 }
@@ -527,6 +560,11 @@ void initGameChoosing()
         char chooseGameRo[] = "Alege tipul jocului:";
         outtextxy(getmaxx()/16, getmaxy()/2-110, chooseGameRo);
     }
+    else if (lang == 3)
+    {
+        char chooseGameFr[] = "Choisissez le type de jeu:";
+        outtextxy(getmaxx()/16, getmaxy()/2-110, chooseGameFr);
+    }
 
     // add image
     readimagefile("bonol_choosing.jpg", getmaxx()/1.6, getmaxy()/4, getmaxx()/3, -getmaxy()/4);
@@ -541,6 +579,7 @@ void initChooseButtons()
     // PVP button
     char pvpEn[] = "Player vs Player";
     char pvpRo[] = "Jucator vs Jucator";
+    char pvpFr[] = "Joueur vs Joueur";
     if (checkClick(mousex(), mousey(), getmaxx()/11, getmaxx()/11+418, getmaxy()/2-30, getmaxy()/2+12)) {
         if (lang == 1)
         {
@@ -549,6 +588,10 @@ void initChooseButtons()
         else if (lang == 2)
         {
             drawButton(getmaxx()/11, getmaxy()/2-30, 5, itsYellow, itsBg, pvpRo);
+        }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/11, getmaxy()/2-30, 5, itsYellow, itsBg, pvpFr);
         }
     }
     else {
@@ -560,11 +603,16 @@ void initChooseButtons()
         {
             drawButton(getmaxx()/11, getmaxy()/2-30, 5, itsBg, itsYellow, pvpRo);
         }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/11, getmaxy()/2-30, 5, itsBg, itsYellow, pvpFr);
+        }
     }
 
     // PVC button
     char pvcEn[] = "Player vs Computer";
     char pvcRo[] = "Jucator vs Calculator";
+    char pvcFr[] = "Joueur vs Ordinateur";
     if (checkClick(mousex(), mousey(), getmaxx()/11, getmaxx()/11+470, getmaxy()/2+50, getmaxy()/2+92))
     {
         if (lang == 1)
@@ -574,6 +622,10 @@ void initChooseButtons()
         else if (lang == 2)
         {
             drawButton(getmaxx()/11, getmaxy()/2+50, 5, itsYellow, itsBg, pvcRo);
+        }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/11, getmaxy()/2+50, 5, itsYellow, itsBg, pvcFr);
         }
     }
     else
@@ -586,6 +638,10 @@ void initChooseButtons()
         {
             drawButton(getmaxx()/11, getmaxy()/2+50, 5, itsBg, itsYellow, pvcRo);
         }
+        else if (lang == 3)
+        {
+            drawButton(getmaxx()/11, getmaxy()/2+50, 5, itsBg, itsYellow, pvcFr);
+        }
     }
 }
 
@@ -593,7 +649,7 @@ void initGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short fsize, winsize, winy;
-    char startTextEn[100], startTextRo[100];
+    char startTextEn[100], startTextRo[100], startTextFr[100];
     short mutari;
     short in, jn, k1, k2;
 
@@ -612,7 +668,7 @@ void initGame()
     settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
     if (lang == 1)
     {
-        strcpy(startTextEn, "Choose the player which will start the game");
+        strcpy(startTextEn, "Choose the player who will start the game");
         outtextxy(getmaxx()/2-150, 100, startTextEn);
         char choiceTextEn[50] = "Button 1 for ";
         strcat(choiceTextEn, player1);
@@ -629,6 +685,16 @@ void initGame()
         strcat(choiceTextRo, " sau 2 pentru ");
         strcat(choiceTextRo, player2);
         outtextxy(getmaxx()/2-150, 140, choiceTextRo);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startTextFr, "Choisissez le joueur qui commencera le jeu");
+        outtextxy(getmaxx()/2-150, 100, startTextFr);
+        char choiceTextFr[50] = "Bouton 1 pour ";
+        strcat(choiceTextFr, player1);
+        strcat(choiceTextFr, " ou 2 pour ");
+        strcat(choiceTextFr, player2);
+        outtextxy(getmaxx()/2-150, 140, choiceTextFr);
     }
 
     short player;
@@ -647,23 +713,24 @@ void initGame()
         }
         else
         {
+            cleardevice();
+            startGame(xx, yy, zz, itsBg);
+            setcolor(WHITE);
             if (lang == 1)
             {
-                cleardevice();
-                startGame(xx, yy, zz, itsBg);
-                setcolor(WHITE);
                 strcpy(startTextEn, "This player doesn't exist. Please type 1 or 2");
                 outtextxy(getmaxx()/2-150, 100, startTextEn);
 
             }
             else if (lang == 2)
             {
-                cleardevice();
-                startGame(xx, yy, zz, itsBg);
-                setcolor(WHITE);
                 strcpy(startTextRo, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
                 outtextxy(getmaxx()/2-150, 100, startTextRo);
-
+            }
+            else if (lang == 3)
+            {
+                strcpy(startTextFr, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+                outtextxy(getmaxx()/2-150, 100, startTextFr);
             }
         }
     }
@@ -675,55 +742,57 @@ void initGame()
     {
         if(player==1)
         {
+            cleardevice();
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
             if (lang == 1)
             {
-                cleardevice();
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pTurnTextEn[50] = "It's ";
                 strcat(pTurnTextEn, player1);
                 strcat(pTurnTextEn, "'s turn");
                 outtextxy(getmaxx()/2-150, 100, pTurnTextEn);
-                startGame(xx, yy, zz, itsBg);
-                goBack();
             }
             else if (lang == 2)
             {
-                cleardevice();
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pTurnTextRo[50] = "Este randul lui ";
                 strcat(pTurnTextRo, player1);
                 outtextxy(getmaxx()/2-150, 100, pTurnTextRo);
-                startGame(xx, yy, zz, itsBg);
-                goBack();
             }
+            else if (lang == 3)
+            {
+                char pTurnTextFr[50] = "C'est au tour de ";
+                strcat(pTurnTextFr, player1);
+                outtextxy(getmaxx()/2-150, 100, pTurnTextFr);
+            }
+            startGame(xx, yy, zz, itsBg);
+            goBack();
         }
         else
         {
+            cleardevice();
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
             if (lang == 1)
             {
-                cleardevice();
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pTurnTextEn[50] = "It's ";
                 strcat(pTurnTextEn, player2);
                 strcat(pTurnTextEn, "'s turn");
                 outtextxy(getmaxx()/2-150, 100, pTurnTextEn);
-                startGame(xx, yy, zz, itsBg);
-                goBack();
             }
             else if (lang == 2)
             {
-                cleardevice();
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pTurnTextRo[50] = "Este randul lui ";
                 strcat(pTurnTextRo, player2);
                 outtextxy(getmaxx()/2-150, 100, pTurnTextRo);
-                startGame(xx, yy, zz, itsBg);
-                goBack();
             }
+            else if (lang == 3)
+            {
+                char pTurnTextFr[50] = "C'est au tour de ";
+                strcat(pTurnTextFr, player2);
+                outtextxy(getmaxx()/2-150, 100, pTurnTextFr);
+            }
+            startGame(xx, yy, zz, itsBg);
+            goBack();
         }
 
         mutari=mutariposibile(player);
@@ -733,10 +802,10 @@ void initGame()
         m1[2] = '\0';
         if(player==1)
         {
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
             if (lang == 1)
             {
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pMovesTextEn[50];
                 strcpy(pMovesTextEn, player1);
                 strcat(pMovesTextEn, " has ");
@@ -746,8 +815,6 @@ void initGame()
             }
             else if (lang == 2)
             {
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pMovesTextRo[50];
                 strcpy(pMovesTextRo, player1);
                 strcat(pMovesTextRo, " are ");
@@ -755,14 +822,22 @@ void initGame()
                 strcat(pMovesTextRo, " mutari");
                 outtextxy(getmaxx()/2-150, 140, pMovesTextRo);
             }
+            else if (lang == 3)
+            {
+                char pMovesTextFr[50];
+                strcpy(pMovesTextFr, player1);
+                strcat(pMovesTextFr, " a ");
+                strcat(pMovesTextFr, m1);
+                strcat(pMovesTextFr, " mouvements");
+                outtextxy(getmaxx()/2-150, 140, pMovesTextFr);
+            }
         }
         else
         {
-
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
             if (lang == 1)
             {
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pMovesTextEn[50];
                 strcpy(pMovesTextEn, player2);
                 strcat(pMovesTextEn, " has ");
@@ -772,8 +847,6 @@ void initGame()
             }
             else if (lang == 2)
             {
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 char pMovesTextRo[50];
                 strcpy(pMovesTextRo, player2);
                 strcat(pMovesTextRo, " are ");
@@ -781,83 +854,94 @@ void initGame()
                 strcat(pMovesTextRo, " mutari");
                 outtextxy(getmaxx()/2-150, 140, pMovesTextRo);
             }
+            else if (lang == 3)
+            {
+                char pMovesTextFr[50];
+                strcpy(pMovesTextFr, player2);
+                strcat(pMovesTextFr, " a ");
+                strcat(pMovesTextFr, m1);
+                strcat(pMovesTextFr, " mouvements");
+                outtextxy(getmaxx()/2-150, 140, pMovesTextFr);
+            }
         }
 
         if(mutari==0)
         {
             if(player==1)
             {
+                cleardevice();
+                char p2Won[20];
+                strcpy(p2Won, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, p2Won);
                 if (lang == 1)
                 {
-                    cleardevice();
-                    char p2Won[20];
-                    strcpy(p2Won, player2);
-                    setcolor(player2Color);
-                    settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
-                    outtextxy(getmaxx()/2-150, 100, p2Won);
                     char p2Won2[] = "has won!!!";
                     outtextxy(getmaxx()/2-150, 160, p2Won2);
                     setcolor(WHITE);
                     settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                     char goBackEn[] = "Click on 'Go back' button to go to the menu";
                     outtextxy(getmaxx()/2-150, 240, goBackEn);
-                    startGame(xx, yy, zz, itsBg);
-                    goBack();
                 }
                 else if (lang == 2)
                 {
-                    cleardevice();
-                    char p2Won[20];
-                    strcpy(p2Won, player2);
-                    setcolor(player2Color);
-                    settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
-                    outtextxy(getmaxx()/2-150, 100, p2Won);
                     char p2Won2[] = "a castigat!!!";
                     outtextxy(getmaxx()/2-150, 160, p2Won2);
                     setcolor(WHITE);
                     settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                     char goBackRo[] = "Click pe 'Inapoi' pentru a te intoarce in meniu";
                     outtextxy(getmaxx()/2-150, 240, goBackRo);
-                    startGame(xx, yy, zz, itsBg);
-                    goBack();
                 }
+                else if (lang == 3)
+                {
+                    char p2Won2[] = "a gagne!!!";
+                    outtextxy(getmaxx()/2-150, 160, p2Won2);
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    char goBackFr[] = "Cliquez sur le 'Revenir' pour accéder au menu";
+                    outtextxy(getmaxx()/2-150, 240, goBackFr);
+                }
+                startGame(xx, yy, zz, itsBg);
+                goBack();
             }
             else
             {
+                cleardevice();
+                char p1Won[20];
+                strcpy(p1Won, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, p1Won);
                 if (lang == 1)
                 {
-                    cleardevice();
-                    char p1Won[20];
-                    strcpy(p1Won, player1);
-                    setcolor(player1Color);
-                    settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
-                    outtextxy(getmaxx()/2-150, 100, p1Won);
                     char p1Won2[] = "has won!!!";
                     outtextxy(getmaxx()/2-150, 160, p1Won2);
                     setcolor(WHITE);
                     settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                     char goBackEn[] = "Click on 'Go back' button to go to the menu";
                     outtextxy(getmaxx()/2-150, 240, goBackEn);
-                    startGame(xx, yy, zz, itsBg);
-                    goBack();
                 }
                 else if (lang == 2)
                 {
-                    cleardevice();
-                    char p1Won[20];
-                    strcpy(p1Won, player1);
-                    setcolor(player1Color);
-                    settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
-                    outtextxy(getmaxx()/2-150, 100, p1Won);
                     char p1Won2[] = "a castigat!!!";
                     outtextxy(getmaxx()/2-150, 160, p1Won2);
                     setcolor(WHITE);
                     settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                     char goBackRo[] = "Click pe 'Inapoi' pentru a te intoarce in meniu";
                     outtextxy(getmaxx()/2-150, 240, goBackRo);
-                    startGame(xx, yy, zz, itsBg);
-                    goBack();
                 }
+                else if (lang == 3)
+                {
+                    char p1Won2[] = "a gagne!!!";
+                    outtextxy(getmaxx()/2-150, 160, p1Won2);
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    char goBackFr[] = "Cliquez sur le 'Revenir' pour accéder au menu";
+                    outtextxy(getmaxx()/2-150, 240, goBackFr);
+                }
+                startGame(xx, yy, zz, itsBg);
+                goBack();
             }
 
             do
@@ -877,19 +961,22 @@ void initGame()
 
         else
         {
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
             if (lang == 1)
             {
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 strcpy(startTextEn, "Click on 3 squares: 2 ends and the corner of new L");
                 outtextxy(getmaxx()/2-150, 180, startTextEn);
             }
             else if (lang == 2)
             {
-                setcolor(WHITE);
-                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                 strcpy(startTextRo, "Click pe 3 patratele: 2 capete si coltul noului L");
                 outtextxy(getmaxx()/2-150, 180, startTextRo);
+            }
+            else if (lang == 3)
+            {
+                strcpy(startTextFr, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+                outtextxy(getmaxx()/2-150, 180, startTextFr);
             }
             clearmouseclick(WM_LBUTTONDOWN);
             while(1)
@@ -995,29 +1082,29 @@ void initGame()
                 if(ok(player,i1,j1,i2,j2,i3,j3))
                 {
                     mutare(player,i1,j1,i2,j2,i3,j3);
-                    cout << "s-a mutat" << '\n';
                     break;
                 }
                 else
                 {
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                     if (lang == 1)
                     {
-                        setcolor(WHITE);
-                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                         strcpy(startTextEn, "A new L can't be created using selected squares. Select other squares");
                         outtextxy(getmaxx()/2-150, 220, startTextEn);
-                        startGame(xx, yy, zz, itsBg);
-                        goBack();
                     }
                     else if (lang == 2)
                     {
-                        setcolor(WHITE);
-                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
                         strcpy(startTextRo, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
                         outtextxy(getmaxx()/2-150, 220, startTextRo);
-                        startGame(xx, yy, zz, itsBg);
-                        goBack();
                     }
+                    else if (lang == 3)
+                    {
+                        strcpy(startTextFr, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                        outtextxy(getmaxx()/2-150, 220, startTextFr);
+                    }
+                    startGame(xx, yy, zz, itsBg);
+                    goBack();
                 }
             }
 
@@ -1042,7 +1129,13 @@ void initGame()
                     outtextxy(getmaxx()/2-150, 100, readPieceRo1);
                     outtextxy(getmaxx()/2-150, 140, readPieceRo2);
                 }
-
+                else if (lang == 3)
+                {
+                    char readPieceFr1[] = "Cliquez sur la pièce neutre que vous souhaitez déplacer";
+                    char readPieceFr2[] = "ou utilisez le clic droit pour ignorer cette étape";
+                    outtextxy(getmaxx()/2-150, 100, readPieceFr1);
+                    outtextxy(getmaxx()/2-150, 140, readPieceFr2);
+                }
                 clearmouseclick(WM_LBUTTONDOWN);
                 clearmouseclick(WM_RBUTTONDOWN);
                 do
@@ -1103,6 +1196,11 @@ void initGame()
                             char nCoordTextRo[] = "Alege un patrat liber unde doresti sa muti piesa neutra";
                             outtextxy(getmaxx()/2-150, 180, nCoordTextRo);
                         }
+                        else if (lang == 3)
+                        {
+                            char nCoordTextFr[] = "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce";
+                            outtextxy(getmaxx()/2-150, 180, nCoordTextFr);
+                        }
 
                         do
                         {
@@ -1155,6 +1253,11 @@ void initGame()
                                 char notFreeRo[] = "Pozitia este deja ocupata, alege alta pozitie";
                                 outtextxy(getmaxx()/2-150, 220, notFreeRo);
                             }
+                            else if (lang == 3)
+                            {
+                                char notFreeFr[] = "Le poste n'est pas libre, choisissez-en un autre";
+                                outtextxy(getmaxx()/2-150, 220, notFreeFr);
+                            }
                             delay(2000);
                         }
                     }
@@ -1172,6 +1275,11 @@ void initGame()
                         {
                             char nCoordTextRo[] = "Alege un patrat liber unde doresti sa muti piesa neutra";
                             outtextxy(getmaxx()/2-150, 180, nCoordTextRo);
+                        }
+                        else if (lang == 3)
+                        {
+                            char nCoordTextFr[] = "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce";
+                            outtextxy(getmaxx()/2-150, 180, nCoordTextFr);
                         }
 
                         do
@@ -1223,6 +1331,11 @@ void initGame()
                                 char notFreeRo[] = "Pozitia este deja ocupata, alege alta pozitie";
                                 outtextxy(getmaxx()/2-150, 220, notFreeRo);
                             }
+                            else if (lang == 3)
+                            {
+                                char notFreeFr[] = "Le poste n'est pas libre, choisissez-en un autre";
+                                outtextxy(getmaxx()/2-150, 220, notFreeFr);
+                            }
                             delay(2000);
                         }
                     }
@@ -1250,6 +1363,11 @@ void initOptions()
         char goptionsRo[] = "Optiuni Joc";
         outtextxy(100, 100, goptionsRo);
     }
+    else if (lang == 3)
+    {
+        char goptionsFr[] = "Options de Jeu";
+        outtextxy(100, 100, goptionsFr);
+    }
 
     // options themselves
     setcolor(WHITE);
@@ -1258,13 +1376,18 @@ void initOptions()
     // change language
     if (lang == 1)
     {
-        char langEn[] = "Change Language:";
+        char langEn[] = "Language:";
         outtextxy(120, 200, langEn);
     }
     else if (lang == 2)
     {
-        char langRo[] = "Schimba Limba:";
+        char langRo[] = "Limba:";
         outtextxy(120, 200, langRo);
+    }
+    else if (lang == 3)
+    {
+        char langFr[] = "Langue:";
+        outtextxy(120, 200, langFr);
     }
     if (lang == 2)
     {
@@ -1286,32 +1409,19 @@ void initOptions()
     }
     char enText[] = "EN";
     outtextxy(520, 200, enText);
+    if (lang == 3)
+    {
+        setcolor(WHITE);
+    }
+    else
+    {
+        setcolor(itsYellow);
+    }
+    char frText[] = "FR";
+    outtextxy(580, 200, frText);
 
     // start/stop music
     setcolor(WHITE);
-    /*if (lang == 1)
-    {
-        char musicEn[] = "Music:";
-        outtextxy(120, 260, musicEn);
-    }
-    else if (lang == 2)
-    {
-        char musicRo[] = "Muzica:";
-        outtextxy(120, 260, musicRo);
-    }
-
-    if (musicOn == 1)
-        setcolor(WHITE);
-    else
-        setcolor(itsYellow);
-    char onBtn[] = "ON";
-    outtextxy(460, 260, onBtn);
-    if (musicOn == 0)
-        setcolor(WHITE);
-    else
-        setcolor(itsYellow);
-    char offBtn[] = "OFF";
-    outtextxy(520, 260, offBtn);*/
 
     // choose song
     if (lang == 1)
@@ -1323,6 +1433,11 @@ void initOptions()
     {
         char songRo[] = "Cantec:";
         outtextxy(120, 260, songRo);
+    }
+    else if (lang == 3)
+    {
+        char songFr[] = "Chanson:";
+        outtextxy(120, 260, songFr);
     }
 
     char leftBtn[] = "<";
@@ -1342,13 +1457,18 @@ void initOptions()
     setcolor(WHITE);
     if (lang == 1)
     {
-        char ptwoEn[] = "Player 1:";
-        outtextxy(120, 320, ptwoEn);
+        char poneEn[] = "Player 1:";
+        outtextxy(120, 320, poneEn);
     }
     else if (lang == 2)
     {
-        char ptwoRo[] = "Jucator 1:";
-        outtextxy(120, 320, ptwoRo);
+        char poneRo[] = "Jucator 1:";
+        outtextxy(120, 320, poneRo);
+    }
+    else if (lang == 3)
+    {
+        char poneFr[] = "Joueur 1:";
+        outtextxy(120, 320, poneFr);
     }
 
     if (active1Color == 1)
@@ -1371,13 +1491,18 @@ void initOptions()
     setcolor(WHITE);
     if (lang == 1)
     {
-        char poneEn[] = "Player 2:";
-        outtextxy(120, 380, poneEn);
+        char ptwoEn[] = "Player 2:";
+        outtextxy(120, 380, ptwoEn);
     }
     else if (lang == 2)
     {
-        char poneRo[] = "Jucator 2:";
-        outtextxy(120, 380, poneRo);
+        char ptwoRo[] = "Jucator 2:";
+        outtextxy(120, 380, ptwoRo);
+    }
+    else if (lang == 3)
+    {
+        char ptwoFr[] = "Joueur 2:";
+        outtextxy(120, 380, ptwoFr);
     }
 
     if (active2Color == 1)
@@ -1414,6 +1539,11 @@ void initInfo()
     {
         char aboutRo[] = "Despre Bonol";
         outtextxy(100, 100, aboutRo);
+    }
+    else if (lang == 3)
+    {
+        char aboutFr[] = "À propos de Bonol";
+        outtextxy(100, 100, aboutFr);
     }
 
     // content itself
@@ -1468,6 +1598,32 @@ void initInfo()
         outtextxy(120, 475, info10Ro);
         outtextxy(120, 500, info11Ro);
     }
+    else if (lang == 3)
+    {
+        char info1Fr[] = "   Le jeu L est un jeu a deux joueurs joue sur une planche de carres 4x4. Chaque joueur a une piece";
+        char info2Fr[] = "en forme de L 3x2, et il y a deux pièces neutres 1x1  (carrés jaunes dans le diagramme).";
+        char info3Fr[] = "   A chaque tour, un joueur doit d'abord déplacer sa pièce en L, puis peut éventuellement déplacer";
+        char info4Fr[] = "l'une des pièces neutres. Le jeu est gagné en laissant l'adversaire incapable de déplacer sa pièce";
+        char info5Fr[] = "L vers une nouvelle position.";
+        char info6Fr[] = "   Les pièces ne doivent pas se chevaucher ou couvrir d'autres pièces. En déplaçant la pièce en L,";
+        char info7Fr[] = "elle est ramassée puis placée dans des cases vides n'importe où sur le plateau. Il peut être tourné";
+        char info8Fr[] = "ou même retourné ce faisant. La seule règle est qu'elle doit se terminer dans une position différente";
+        char info9Fr[] = "de celle où elle a commencé; couvrant ainsi au moins un carré, il ne couvrait pas auparavant. Pour";
+        char info10Fr[] = "déplacer une pièce neutre, un joueur la prend simplement, puis le place sur une case vide n'importe";
+        char info11Fr[] = "où sur le plateau.";
+
+        outtextxy(120, 200, info1Fr);
+        outtextxy(120, 225, info2Fr);
+        outtextxy(120, 275, info3Fr);
+        outtextxy(120, 300, info4Fr);
+        outtextxy(120, 350, info5Fr);
+        outtextxy(120, 375, info6Fr);
+        outtextxy(120, 400, info7Fr);
+        outtextxy(120, 425, info8Fr);
+        outtextxy(120, 450, info9Fr);
+        outtextxy(120, 475, info10Fr);
+        outtextxy(120, 500, info11Fr);
+    }
 
     // go back button
     goBack();
@@ -1505,7 +1661,7 @@ void showMenu()
         }
 
         // if player clicks the GAME INFO button
-        if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+232, getmaxy()/2+10, getmaxy()/2+50))
+        if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+310, getmaxy()/2+10, getmaxy()/2+50))
         {
             clearmouseclick(WM_LBUTTONDOWN);
             isMenu=0;
@@ -1515,7 +1671,7 @@ void showMenu()
         }
 
         // if player clicks the EXIT button
-        if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+102, getmaxy()/2+80, getmaxy()/2+120))
+        if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()/10, getmaxx()/10+232, getmaxy()/2+80, getmaxy()/2+120))
         {
             clearmouseclick(WM_LBUTTONDOWN);
             closegraph();
@@ -1641,30 +1797,41 @@ void showOptions()
                 else if (active2Color == 5)
                     strcpy(player2, "Greenery");
 
-                strcpy(player1, "Red");
-                strcpy(player2, "Blue");
                 cleardevice();
                 showOptions();
             }
 
-            // play/stop music
-            /*if (checkClick(mousex(), mousey(), 460, 500, 260, 285))
+            if (checkClick(mousex(), mousey(), 580, 620, 205, 224))
             {
                 clearmouseclick(WM_LBUTTONDOWN);
-                musicOn=1;
-                PlaySound(TEXT("miyagi_badabum.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                lang=3;
+
+                // change players' names
+                if (active1Color == 1)
+                    strcpy(player1, "Rouge");
+                else if (active1Color == 2)
+                    strcpy(player1, "Orange Sombre");
+                else if (active1Color == 3)
+                    strcpy(player1, "Orange");
+                else if (active1Color == 4)
+                    strcpy(player1, "Violet");
+                else if (active1Color == 5)
+                    strcpy(player1, "Rose");
+
+                if (active2Color == 1)
+                    strcpy(player2, "Bleu");
+                else if (active2Color == 2)
+                    strcpy(player2, "Bleu Froid");
+                else if (active2Color == 3)
+                    strcpy(player2, "Aqua");
+                else if (active2Color == 4)
+                    strcpy(player2, "Vert");
+                else if (active2Color == 5)
+                    strcpy(player2, "Verdure");
+
                 cleardevice();
                 showOptions();
             }
-
-            if (checkClick(mousex(), mousey(), 522, 580, 260, 285))
-            {
-                clearmouseclick(WM_LBUTTONDOWN);
-                musicOn=0;
-                PlaySound(NULL, 0, 0);
-                cleardevice();
-                showOptions();
-            }*/
 
             // change song
             cout << mousex() << " " << mousey() << '\n';
@@ -1746,6 +1913,10 @@ void showOptions()
                 {
                     strcpy(player1, "Rosu");
                 }
+                else if (lang == 3)
+                {
+                    strcpy(player1, "Rouge");
+                }
                 player1Color=COLOR(221, 65, 50);
                 player1ClickColor=COLOR(154, 36, 25);
                 cleardevice();
@@ -1765,6 +1936,10 @@ void showOptions()
                 {
                     strcpy(player1, "Portocaliu Inchis");
                 }
+                else if (lang == 3)
+                {
+                    strcpy(player1, "Orange Sombre");
+                }
                 player1Color=COLOR(249, 103, 20);
                 player1ClickColor=COLOR(199, 76, 5);
                 cleardevice();
@@ -1776,7 +1951,7 @@ void showOptions()
             {
                 clearmouseclick(WM_LBUTTONDOWN);
                 active1Color=3;
-                if (lang == 1)
+                if (lang == 1 || lang == 3)
                 {
                     strcpy(player1, "Orange");
                 }
@@ -1815,6 +1990,10 @@ void showOptions()
                 {
                     strcpy(player1, "Roz");
                 }
+                else if (lang == 3)
+                {
+                    strcpy(player1, "Rose");
+                }
                 player1Color=COLOR(255, 128, 149);
                 player1ClickColor=COLOR(255, 77, 106);
                 cleardevice();
@@ -1834,6 +2013,10 @@ void showOptions()
                 {
                     strcpy(player2, "Albastru");
                 }
+                else if (lang == 3)
+                {
+                    strcpy(player2, "Bleu");
+                }
                 player2Color=COLOR(51, 51, 255);
                 player2ClickColor=COLOR(0, 0, 204);
                 cleardevice();
@@ -1852,6 +2035,10 @@ void showOptions()
                 else if (lang == 2)
                 {
                     strcpy(player2, "Albastru Rece");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(player2, "Bleu Froid");
                 }
                 player2Color=COLOR(0, 153, 255);
                 player2ClickColor=COLOR(0, 107, 179);
@@ -1884,6 +2071,10 @@ void showOptions()
                 {
                     strcpy(player2, "Verde");
                 }
+                else if (lang == 3)
+                {
+                    strcpy(player2, "Vert");
+                }
                 player2Color=COLOR(77, 255, 136);
                 player2ClickColor=COLOR(0, 204, 68);
                 cleardevice();
@@ -1895,7 +2086,14 @@ void showOptions()
             {
                 clearmouseclick(WM_LBUTTONDOWN);
                 active2Color=5;
-                strcpy(player2, "Greenery");
+                if (lang == 1 || lang == 2)
+                {
+                    strcpy(player2, "Greenery");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(player2, "Verdure");
+                }
                 player2Color=COLOR(162, 193, 113);
                 player2ClickColor=COLOR(111, 142, 62);
                 cleardevice();
