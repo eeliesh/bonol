@@ -29,6 +29,8 @@ short pj3[]= {0, 1, 0, 2, 2, 0, 1, 0, 0, -1, 0, -2, -2, 0, -1, 0};
 bool isMenu=1;
 bool isChoosing=0;
 bool isChoosingDifficulty=0;
+bool isPvpGame=0;
+bool isPvcGame=0;
 bool isOptions=0;
 bool isInfo=0;
 void showMenu();
@@ -51,15 +53,11 @@ void mutare(short player, short i1, short j1, short i2, short j2, short i3, shor
 short lang=1;
 
 // music is on/off by default
-bool musicOn=0;
+bool musicOn=1;
 
 // default song name and number
 char songName[50] = "Miyagi - Badabum";
 short songNr=1;
-
-short fsize;
-
-char startText[100], choiceText[100], pTurnText[50], pMovesText[50], pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70], newCoordTxt[75], notFreeTxt[75], readPieceTxt1[70], readPieceTxt2[70];
 
 // get screen width and height
 DWORD screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -390,9 +388,20 @@ int possibleMoves(short player, short i1, short j1, short i2, short j2, short i3
         for (j=1; j<=4; j++)
         {
             A[i][j]=M[i][j];
+            cout << A[i][j] << ' ';
         }
+        cout << '\n';
     }
+    cout << '\n';
     mutare(3-player, i1, j1, i2, j2, i3, j3);
+    for (i=1; i<=4; i++)
+    {
+        for (j=1; j<=4; j++)
+        {
+            cout << M[i][j] << ' ';
+        }
+        cout << '\n';
+    }
     if(player==1)
     {
         for(i=1; i<=4; i++)
@@ -1155,10 +1164,15 @@ void initDifficultyButtons()
         strcpy(hardTxt, "Difficile");
     }
 
+    if (ismouseclick(WM_LBUTTONDOWN))
+    {
+        cout << mousex() << ' ' << mousey() << '\n';
+    }
+
     // easy button
     if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+195, getmaxy()/2-60, getmaxy()/2-8))
     {
-        drawButton(getmaxx()/2+60, getmaxy()/2-60, 6, itsYellow, itsBg, easyTxt);
+       drawButton(getmaxx()/2+60, getmaxy()/2-60, 6, itsYellow, itsBg, easyTxt);
     }
     else
     {
@@ -1186,8 +1200,28 @@ void initDifficultyButtons()
     }
 }
 
-void moveFirstTxt()
+void initPvpGame()
 {
+    short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    short fsize, winsize, winy;
+    char startText[100], choiceText[100];
+    short mutari;
+    short in, jn, k1, k2;
+
+    // display the game table;
+
+    startConfig();
+    startGame(xx, yy, zz, itsBg);
+
+    setcolor(WHITE);
+
+    if (getmaxx() >= 1600)
+        fsize=3;
+    else
+        fsize=2;
+
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+
     if (lang == 1)
     {
         strcpy(startText, "Choose the player who will move first");
@@ -1212,252 +1246,8 @@ void moveFirstTxt()
         strcat(choiceText, " ou 2 pour ");
         strcat(choiceText, player2);
     }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
     outtextxy(getmaxx()/2-150, 100, startText);
     outtextxy(getmaxx()/2-150, 140, choiceText);
-}
-
-void doesntExistTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(startText, "This player doesn't exist. Please type 1 or 2");
-    }
-    else if (lang == 2)
-    {
-        strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
-    }
-    else if (lang == 3)
-    {
-        strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
-    }
-    setcolor(WHITE);
-    outtextxy(getmaxx()/2-150, 100, startText);
-}
-
-void playerTurnTxt(char player[20])
-{
-    if (lang == 1)
-    {
-        strcpy(pTurnText, "It's ");
-        strcat(pTurnText, player);
-        strcat(pTurnText, "'s turn");
-    }
-    else if (lang == 2)
-    {
-        strcpy(pTurnText, "Este randul lui ");
-        strcat(pTurnText, player);
-    }
-    else if (lang == 3)
-    {
-        strcpy(pTurnText, "C'est au tour de ");
-        strcat(pTurnText, player);
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 100, pTurnText);
-}
-
-void possibleMovesTxt(char player[20], char moves[3])
-{
-    if (lang == 1)
-    {
-        strcpy(pMovesText, player);
-        strcat(pMovesText, " has ");
-        strcat(pMovesText, moves);
-        strcat(pMovesText, " moves");
-    }
-    else if (lang == 2)
-    {
-        strcpy(pMovesText, player);
-        strcat(pMovesText, " are ");
-        strcat(pMovesText, moves);
-        strcat(pMovesText, " mutari");
-    }
-    else if (lang == 3)
-    {
-        strcpy(pMovesText, player);
-        strcat(pMovesText, " a ");
-        strcat(pMovesText, moves);
-        strcat(pMovesText, " mouvements");
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 140, pMovesText);
-}
-
-void hasWonTxt(char player[20], int playerColor)
-{
-    strcpy(pWonTxt1, player);
-    setcolor(playerColor);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
-    outtextxy(getmaxx()/2-150, 100, pWonTxt1);
-    if (lang == 1)
-    {
-        strcpy(pWonTxt2, "has won!!!");
-        strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
-    }
-    else if (lang == 2)
-    {
-        strcpy(pWonTxt2, "a castigat!!!");
-        strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
-    }
-    else if (lang == 3)
-    {
-        strcpy(pWonTxt2, "a gagne!!!");
-        strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
-    }
-    outtextxy(getmaxx()/2-150, 160, pWonTxt2);
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
-}
-
-void clickOnSquareTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
-    }
-    else if (lang == 2)
-    {
-        strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
-    }
-    else if (lang == 3)
-    {
-        strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 180, startText);
-}
-
-void cantCreateTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(startText, "A new L can't be created using selected squares. Select other squares");
-    }
-    else if (lang == 2)
-    {
-        strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
-    }
-    else if (lang == 3)
-    {
-        strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 220, startText);
-}
-
-void movePieceTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
-        strcpy(readPieceTxt2, "right click to skip this step");
-    }
-    else if (lang == 2)
-    {
-        strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
-        strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
-    }
-    else if (lang == 3)
-    {
-        strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
-        strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
-    outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
-}
-
-void chooseSquareTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
-    }
-    else if (lang == 2)
-    {
-        strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
-    }
-    else if (lang == 3)
-    {
-        strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 180, newCoordTxt);
-}
-
-void posNotFreeTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(notFreeTxt, "The position is not free, choose another one");
-    }
-    else if (lang == 2)
-    {
-        strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
-    }
-    else if (lang == 3)
-    {
-        strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 220, notFreeTxt);
-}
-
-void wantedPlayerTxt()
-{
-    if (lang == 1)
-    {
-        strcpy(startText, "Choose the player which you want to be");
-        strcpy(choiceText, "Button 1 for ");
-        strcat(choiceText, player1);
-        strcat(choiceText, " or 2 for ");
-        strcat(choiceText, player2);
-    }
-    else if (lang == 2)
-    {
-        strcpy(startText, "Alege jucatorul care vrei sa fii");
-        strcpy(choiceText, "Tasta 1 pentru ");
-        strcat(choiceText, player1);
-        strcat(choiceText, " sau 2 pentru ");
-        strcat(choiceText, player2);
-    }
-    else if (lang == 3)
-    {
-        strcpy(startText, "Choisissez le joueur que vous voulez être");
-        strcpy(choiceText, "Bouton 1 pour ");
-        strcat(choiceText, player1);
-        strcat(choiceText, " ou 2 pour ");
-        strcat(choiceText, player2);
-    }
-    setcolor(WHITE);
-    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
-    outtextxy(getmaxx()/2-150, 100, startText);
-    outtextxy(getmaxx()/2-150, 140, choiceText);
-}
-
-void initPvpGame()
-{
-    short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
-    short mutari;
-    short in, jn, k1, k2;
-
-    // display the game table;
-
-    startConfig();
-    startGame(xx, yy, zz, itsBg);
-
-    // display the 'who will move first' text
-    moveFirstTxt();
 
     short player;
 
@@ -1476,9 +1266,20 @@ void initPvpGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the 'player does not exist' text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
 
@@ -1491,58 +1292,185 @@ void initPvpGame()
         if(player==1)
         {
             cleardevice();
-
-            // display the 'it is player's turn' text
-            playerTurnTxt(player1);
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player1);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player1);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player1);
+            }
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
         else
         {
             cleardevice();
-
-            // display the 'it is player's turn' text
-            playerTurnTxt(player2);
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player2);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player2);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player2);
+            }
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
-        startGame(xx, yy, zz, itsBg);
-        goToMenu();
 
         mutari=mutariposibile(player);
         char m1[3];
         m1[0] = '0'+mutari/10;
         m1[1] = '0'+mutari%10;
         m1[2] = '\0';
-
+        char pMovesText[50];
         if(player==1)
         {
-            // display player's possible moves text
-            possibleMovesTxt(player1, m1);
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
         else
         {
-            // display player's possible moves text
-            possibleMovesTxt(player2, m1);
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
 
         if(mutari==0)
         {
-            cleardevice();
+            char pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70];
             if(player==1)
             {
-                // display the player has won text
-                hasWonTxt(player2, player2Color);
+                cleardevice();
+                strcpy(pWonTxt1, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
             else
             {
-                // display the player has won text
-                hasWonTxt(player1, player1Color);
+                cleardevice();
+                strcpy(pWonTxt1, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
-            startGame(xx, yy, zz, itsBg);
-            goToMenu();
 
             do
             {
                 if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                 {
                     isMenu=1;
+                    isPvpGame=0;
                     cleardevice();
                     showMenu();
                     clearmouseclick(WM_LBUTTONDOWN);
@@ -1555,10 +1483,20 @@ void initPvpGame()
         else
         {
             setcolor(WHITE);
-
-            // display the click on square txt
-            clickOnSquareTxt();
-
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (lang == 1)
+            {
+                strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+            }
+            outtextxy(getmaxx()/2-150, 180, startText);
             clearmouseclick(WM_LBUTTONDOWN);
             while(1)
             {
@@ -1641,10 +1579,11 @@ void initPvpGame()
                             }
                         }
 
-                        // go to menu button
+                        // go back
                         else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                         {
                             isMenu=1;
+                            isPvpGame=0;
                             cleardevice();
                             showMenu();
                         }
@@ -1662,9 +1601,21 @@ void initPvpGame()
                 }
                 else
                 {
-                    // display the can't create a new L text
-                    cantCreateTxt();
-
+                    if (lang == 1)
+                    {
+                        strcpy(startText, "A new L can't be created using selected squares. Select other squares");
+                    }
+                    else if (lang == 2)
+                    {
+                        strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
+                    }
+                    else if (lang == 3)
+                    {
+                        strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                    }
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    outtextxy(getmaxx()/2-150, 220, startText);
                     startGame(xx, yy, zz, itsBg);
                     goToMenu();
                 }
@@ -1672,13 +1623,29 @@ void initPvpGame()
 
             while(1)
             {
+                char readPieceTxt1[70], readPieceTxt2[70];
                 cleardevice();
                 startGame(xx, yy, zz, itsBg);
                 goToMenu();
-
-                // display the click on neutral piece text
-                movePieceTxt();
-
+                if (lang == 1)
+                {
+                    strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
+                    strcpy(readPieceTxt2, "right click to skip this step");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
+                    strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
+                    strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
+                }
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
+                outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
                 clearmouseclick(WM_LBUTTONDOWN);
                 clearmouseclick(WM_RBUTTONDOWN);
                 do
@@ -1699,10 +1666,11 @@ void initPvpGame()
                             clearmouseclick(WM_LBUTTONDOWN);
                         }
 
-                        // go to menu button
+                        // go back
                         else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                         {
                             isMenu=1;
+                            isPvpGame=0;
                             cleardevice();
                             clearmouseclick(WM_LBUTTONDOWN);
                             showMenu();
@@ -1720,12 +1688,27 @@ void initPvpGame()
                 }
                 while (1);
 
+                char newCoordTxt[75], notFreeTxt[75];
+
                 if (in!=-1)
                 {
                     if(M[in][jn]=='*')
                     {
-                        // display the choose free square for piece text
-                        chooseSquareTxt();
+                        if (lang == 1)
+                        {
+                            strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                         do
                         {
@@ -1738,10 +1721,11 @@ void initPvpGame()
                                     clearmouseclick(WM_LBUTTONDOWN);
                                 }
 
-                                // go to menu button
+                                // go back
                                 else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                 {
                                     isMenu=1;
+                                    isPvpGame=0;
                                     cleardevice();
                                     clearmouseclick(WM_LBUTTONDOWN);
                                     showMenu();
@@ -1763,17 +1747,42 @@ void initPvpGame()
                         }
                         else
                         {
-                            // display the not free position text
-                            posNotFreeTxt();
-
+                            if (lang == 1)
+                            {
+                                strcpy(notFreeTxt, "The position is not free, choose another one");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                             delay(2000);
                         }
                     }
 
                     else if(M[in][jn]=='#')
                     {
-                        // display the choose free square for piece text
-                        chooseSquareTxt();
+                        if (lang == 1)
+                        {
+                            strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                         do
                         {
@@ -1786,10 +1795,11 @@ void initPvpGame()
                                     clearmouseclick(WM_LBUTTONDOWN);
                                 }
 
-                                // go to menu button
+                                // go back
                                 else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                 {
                                     isMenu=1;
+                                    isPvpGame=0;
                                     cleardevice();
                                     clearmouseclick(WM_LBUTTONDOWN);
                                     showMenu();
@@ -1811,9 +1821,20 @@ void initPvpGame()
                         }
                         else
                         {
-                            // display the not free position text
-                            posNotFreeTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(notFreeTxt, "The position is not free, choose another one");
+                            }
+                            else if (lang == 2)
+                            {
 
+                                strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                            }
+                            outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                             delay(2000);
                         }
                     }
@@ -1829,6 +1850,8 @@ void initPvpGame()
 void initEasyPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    short fsize, winsize, winy;
+    char startText[100], choiceText[100];
     short mutari;
     short in, jn, k1, k2;
 
@@ -1838,8 +1861,38 @@ void initEasyPvcGame()
 
     setcolor(WHITE);
 
-    // display the choose the player who you wanna be text
-    wantedPlayerTxt();
+    if (getmaxx() >= 1600)
+        fsize=3;
+    else
+        fsize=2;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which you want to be");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care vrei sa fii");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur que vous voulez être");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
 
     short player;
 
@@ -1858,9 +1911,20 @@ void initEasyPvcGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the player doesn't exist text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
     cleardevice();
@@ -1873,8 +1937,32 @@ void initEasyPvcGame()
 
     short computer=3-player;
 
-    // display the player who will move first text
-    moveFirstTxt();
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which will start the game");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care va muta primul");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur qui commencera le jeu");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
 
     while (1)
     {
@@ -1891,9 +1979,20 @@ void initEasyPvcGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the player doesn't exist text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
 
@@ -1902,19 +2001,57 @@ void initEasyPvcGame()
 
     while(1)
     {
-        cleardevice();
+        char pTurnText[50];
         if(player==1)
         {
-            // display the it's player's turn text
-            playerTurnTxt(player1);
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player1);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player1);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player1);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
         else
         {
-            // display the it's player's turn text
-            playerTurnTxt(player2);
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player2);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player2);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player2);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
-        startGame(xx, yy, zz, itsBg);
-        goToMenu();
 
         if (computer==player)
         {
@@ -1929,39 +2066,132 @@ void initEasyPvcGame()
         m1[0] = '0'+mutari/10;
         m1[1] = '0'+mutari%10;
         m1[2] = '\0';
+        char pMovesText[50];
 
         if(player==1)
         {
-            // display the player's possible moves text
-            possibleMovesTxt(player1, m1);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
         else
         {
-            // display the player's possible moves text
-            possibleMovesTxt(player2, m1);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
 
         if(mutari==0)
         {
-            cleardevice();
+            char pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70];
+
             if(player==1)
             {
-                // display the player has won text
-                hasWonTxt(player2, player2Color);
+                cleardevice();
+                strcpy(pWonTxt1, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
             else
             {
-                // display the player has won text
-                hasWonTxt(player1, player1Color);
+                cleardevice();
+                strcpy(pWonTxt1, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
-            startGame(xx, yy, zz, itsBg);
-            goToMenu();
 
             do
             {
                 if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                 {
                     isMenu=1;
+                    isPvpGame=0;
                     cleardevice();
                     showMenu();
                     clearmouseclick(WM_LBUTTONDOWN);
@@ -2013,9 +2243,20 @@ void initEasyPvcGame()
             }
             else
             {
-                // display the choose squares for new L text
-                clickOnSquareTxt();
 
+                if (lang == 1)
+                {
+                    strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+                }
+                outtextxy(getmaxx()/2-150, 180, startText);
                 clearmouseclick(WM_LBUTTONDOWN);
 
                 while(1)
@@ -2099,10 +2340,11 @@ void initEasyPvcGame()
                                 }
                             }
 
-                            // go to menu button
+                            // go back
                             else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                             {
                                 isMenu=1;
+                                isPvpGame=0;
                                 cleardevice();
                                 showMenu();
                             }
@@ -2120,9 +2362,21 @@ void initEasyPvcGame()
                     }
                     else
                     {
-                        // display the can't create text
-                        cantCreateTxt();
-
+                        if (lang == 1)
+                        {
+                            strcpy(startText, "A new L can't be created using selected squares. Select other squares");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 220, startText);
                         startGame(xx, yy, zz, itsBg);
                         goToMenu();
                     }
@@ -2130,13 +2384,29 @@ void initEasyPvcGame()
 
                 while(1)
                 {
+                    char readPieceTxt1[70], readPieceTxt2[70];
                     cleardevice();
                     startGame(xx, yy, zz, itsBg);
                     goToMenu();
-
-                    // display the choose piece text
-                    movePieceTxt();
-
+                    if (lang == 1)
+                    {
+                        strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
+                        strcpy(readPieceTxt2, "right click to skip this step");
+                    }
+                    else if (lang == 2)
+                    {
+                        strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
+                        strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
+                    }
+                    else if (lang == 3)
+                    {
+                        strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
+                        strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
+                    }
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
+                    outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
                     clearmouseclick(WM_LBUTTONDOWN);
                     clearmouseclick(WM_RBUTTONDOWN);
                     do
@@ -2157,10 +2427,11 @@ void initEasyPvcGame()
                                 clearmouseclick(WM_LBUTTONDOWN);
                             }
 
-                            // go to menu button
+                            // go back
                             else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                             {
                                 isMenu=1;
+                                isPvpGame=0;
                                 cleardevice();
                                 clearmouseclick(WM_LBUTTONDOWN);
                                 showMenu();
@@ -2178,12 +2449,27 @@ void initEasyPvcGame()
                     }
                     while (1);
 
+                    char newCoordTxt[75], notFreeTxt[75];
+
                     if (in!=-1)
                     {
                         if(M[in][jn]=='*')
                         {
-                            // display the choose square text
-                            chooseSquareTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                             do
                             {
@@ -2196,10 +2482,11 @@ void initEasyPvcGame()
                                         clearmouseclick(WM_LBUTTONDOWN);
                                     }
 
-                                    // go to menu button
+                                    // go back
                                     else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                     {
                                         isMenu=1;
+                                        isPvpGame=0;
                                         cleardevice();
                                         clearmouseclick(WM_LBUTTONDOWN);
                                         showMenu();
@@ -2221,17 +2508,42 @@ void initEasyPvcGame()
                             }
                             else
                             {
-                                // display the position not free text
-                                posNotFreeTxt();
-
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                                 delay(2000);
                             }
                         }
 
                         else if(M[in][jn]=='#')
                         {
-                            // display the choose new square text
-                            chooseSquareTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                             do
                             {
@@ -2244,10 +2556,11 @@ void initEasyPvcGame()
                                         clearmouseclick(WM_LBUTTONDOWN);
                                     }
 
-                                    // go to menu button
+                                    // go back
                                     else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                     {
                                         isMenu=1;
+                                        isPvpGame=0;
                                         cleardevice();
                                         clearmouseclick(WM_LBUTTONDOWN);
                                         showMenu();
@@ -2269,9 +2582,21 @@ void initEasyPvcGame()
                             }
                             else
                             {
-                                // display the position not free text
-                                posNotFreeTxt();
-
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                                 delay(2000);
                             }
                         }
@@ -2289,6 +2614,8 @@ void initEasyPvcGame()
 void initMediumPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    short fsize, winsize, winy;
+    char startText[100], choiceText[100];
     short mutari;
     short in, jn, k1, k2;
 
@@ -2298,8 +2625,38 @@ void initMediumPvcGame()
 
     setcolor(WHITE);
 
-    // display the choose wanted player text
-    wantedPlayerTxt();
+    if (getmaxx() >= 1600)
+        fsize=3;
+    else
+        fsize=2;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which you want to be");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care vrei sa fii");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur que vous voulez être");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
 
     short player;
 
@@ -2318,9 +2675,20 @@ void initMediumPvcGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the player doesn't exist text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
     cleardevice();
@@ -2329,10 +2697,36 @@ void initMediumPvcGame()
     startConfig();
     startGame(xx, yy, zz, itsBg);
 
+    setcolor(WHITE);
+
     short computer=3-player;
 
-    // display the choose the player who will move first text
-    moveFirstTxt();
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which will start the game");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care va muta primul");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur qui commencera le jeu");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
 
     while (1)
     {
@@ -2349,9 +2743,20 @@ void initMediumPvcGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the player doesn't exist text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
 
@@ -2360,19 +2765,57 @@ void initMediumPvcGame()
 
     while(1)
     {
-        cleardevice();
+        char pTurnText[50];
         if(player==1)
         {
-            // display the it's player's turn text
-            playerTurnTxt(player1);
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player1);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player1);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player1);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
         else
         {
-            // display the it's player's turn text
-            playerTurnTxt(player2);
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player2);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player2);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player2);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
-        startGame(xx, yy, zz, itsBg);
-        goToMenu();
 
         if (computer==player)
         {
@@ -2387,39 +2830,132 @@ void initMediumPvcGame()
         m1[0] = '0'+mutari/10;
         m1[1] = '0'+mutari%10;
         m1[2] = '\0';
+        char pMovesText[50];
 
         if(player==1)
         {
-            // display the player moves text
-            possibleMovesTxt(player1, m1);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
         else
         {
-            // display the player moves text
-            possibleMovesTxt(player2, m1);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
 
         if(mutari==0)
         {
-            cleardevice();
+            char pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70];
+
             if(player==1)
             {
-                // display the player has won text
-                hasWonTxt(player2, player2Color);
+                cleardevice();
+                strcpy(pWonTxt1, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
             else
             {
-                // display the player has won text
-                hasWonTxt(player1, player1Color);
+                cleardevice();
+                strcpy(pWonTxt1, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
-            startGame(xx, yy, zz, itsBg);
-            goToMenu();
 
             do
             {
                 if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                 {
                     isMenu=1;
+                    isPvpGame=0;
                     cleardevice();
                     showMenu();
                     clearmouseclick(WM_LBUTTONDOWN);
@@ -2478,9 +3014,20 @@ void initMediumPvcGame()
             }
             else
             {
-                // display the choose free squares for the new L text
-                clickOnSquareTxt();
 
+                if (lang == 1)
+                {
+                    strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+                }
+                outtextxy(getmaxx()/2-150, 180, startText);
                 clearmouseclick(WM_LBUTTONDOWN);
 
                 while(1)
@@ -2564,10 +3111,11 @@ void initMediumPvcGame()
                                 }
                             }
 
-                            // go to menu button
+                            // go back
                             else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                             {
                                 isMenu=1;
+                                isPvpGame=0;
                                 cleardevice();
                                 showMenu();
                             }
@@ -2585,9 +3133,21 @@ void initMediumPvcGame()
                     }
                     else
                     {
-                        // display the can't create text
-                        cantCreateTxt();
-
+                        if (lang == 1)
+                        {
+                            strcpy(startText, "A new L can't be created using selected squares. Select other squares");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 220, startText);
                         startGame(xx, yy, zz, itsBg);
                         goToMenu();
                     }
@@ -2595,13 +3155,29 @@ void initMediumPvcGame()
 
                 while(1)
                 {
+                    char readPieceTxt1[70], readPieceTxt2[70];
                     cleardevice();
                     startGame(xx, yy, zz, itsBg);
                     goToMenu();
-
-                    // display the click on neutral piece text
-                    movePieceTxt();
-
+                    if (lang == 1)
+                    {
+                        strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
+                        strcpy(readPieceTxt2, "right click to skip this step");
+                    }
+                    else if (lang == 2)
+                    {
+                        strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
+                        strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
+                    }
+                    else if (lang == 3)
+                    {
+                        strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
+                        strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
+                    }
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
+                    outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
                     clearmouseclick(WM_LBUTTONDOWN);
                     clearmouseclick(WM_RBUTTONDOWN);
                     do
@@ -2622,10 +3198,11 @@ void initMediumPvcGame()
                                 clearmouseclick(WM_LBUTTONDOWN);
                             }
 
-                            // go to menu button
+                            // go back
                             else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                             {
                                 isMenu=1;
+                                isPvpGame=0;
                                 cleardevice();
                                 clearmouseclick(WM_LBUTTONDOWN);
                                 showMenu();
@@ -2643,12 +3220,27 @@ void initMediumPvcGame()
                     }
                     while (1);
 
+                    char newCoordTxt[75], notFreeTxt[75];
+
                     if (in!=-1)
                     {
                         if(M[in][jn]=='*')
                         {
-                            // display the choose a new square for the neutral piece text
-                            chooseSquareTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                             do
                             {
@@ -2661,10 +3253,11 @@ void initMediumPvcGame()
                                         clearmouseclick(WM_LBUTTONDOWN);
                                     }
 
-                                    // go to menu button
+                                    // go back
                                     else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                     {
                                         isMenu=1;
+                                        isPvpGame=0;
                                         cleardevice();
                                         clearmouseclick(WM_LBUTTONDOWN);
                                         showMenu();
@@ -2686,17 +3279,42 @@ void initMediumPvcGame()
                             }
                             else
                             {
-                                // display the position not free text
-                                posNotFreeTxt();
-
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                                 delay(2000);
                             }
                         }
 
                         else if(M[in][jn]=='#')
                         {
-                            // display the choose a free square text
-                            chooseSquareTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                             do
                             {
@@ -2709,10 +3327,11 @@ void initMediumPvcGame()
                                         clearmouseclick(WM_LBUTTONDOWN);
                                     }
 
-                                    // go to menu button
+                                    // go back
                                     else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                     {
                                         isMenu=1;
+                                        isPvpGame=0;
                                         cleardevice();
                                         clearmouseclick(WM_LBUTTONDOWN);
                                         showMenu();
@@ -2734,9 +3353,21 @@ void initMediumPvcGame()
                             }
                             else
                             {
-                                // display the position not free text
-                                posNotFreeTxt();
-
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                                 delay(2000);
                             }
                         }
@@ -2753,6 +3384,8 @@ void initMediumPvcGame()
 void initHardPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    short fsize, winsize, winy;
+    char startText[100], choiceText[100];
     short mutari;
     short in, jn, k1, k2;
 
@@ -2760,8 +3393,40 @@ void initHardPvcGame()
     startConfig();
     startGame(xx, yy, zz, itsBg);
 
-    // display the choose wanted player text
-    wantedPlayerTxt();
+    setcolor(WHITE);
+
+    if (getmaxx() >= 1600)
+        fsize=3;
+    else
+        fsize=2;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which you want to be");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care vrei sa fii");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur que vous voulez être");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
 
     short player;
 
@@ -2780,9 +3445,20 @@ void initHardPvcGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the player doesn't exist text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
     cleardevice();
@@ -2791,10 +3467,36 @@ void initHardPvcGame()
     startConfig();
     startGame(xx, yy, zz, itsBg);
 
+    setcolor(WHITE);
+
     short computer=3-player;
 
-    // display the choose the player who will move first text
-    moveFirstTxt();
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which will start the game");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care va muta primul");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur qui commencera le jeu");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
 
     while (1)
     {
@@ -2811,9 +3513,20 @@ void initHardPvcGame()
         {
             cleardevice();
             startGame(xx, yy, zz, itsBg);
-
-            // display the player doesn't exist text
-            doesntExistTxt();
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
         }
     }
 
@@ -2822,19 +3535,57 @@ void initHardPvcGame()
 
     while(1)
     {
-        cleardevice();
+        char pTurnText[50];
         if(player==1)
         {
-            // display the it's player's turn text
-            playerTurnTxt(player1);
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player1);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player1);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player1);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
         else
         {
-            // display the it's player's turn text
-            playerTurnTxt(player2);
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player2);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player2);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player2);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
         }
-        startGame(xx, yy, zz, itsBg);
-        goToMenu();
 
         if (computer==player)
         {
@@ -2849,39 +3600,132 @@ void initHardPvcGame()
         m1[0] = '0'+mutari/10;
         m1[1] = '0'+mutari%10;
         m1[2] = '\0';
+        char pMovesText[50];
 
         if(player==1)
         {
-            // display the player moves text
-            possibleMovesTxt(player1, m1);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
         else
         {
-            // display the player moves text
-            possibleMovesTxt(player2, m1);
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
         }
 
         if(mutari==0)
         {
-            cleardevice();
+            char pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70];
+
             if(player==1)
             {
-                // display the player has won text
-                hasWonTxt(player2, player2Color);
+                cleardevice();
+                strcpy(pWonTxt1, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
             else
             {
-                // display the player has won text
-                hasWonTxt(player1, player1Color);
+                cleardevice();
+                strcpy(pWonTxt1, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
             }
-            startGame(xx, yy, zz, itsBg);
-            goToMenu();
 
             do
             {
                 if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                 {
                     isMenu=1;
+                    isPvpGame=0;
                     cleardevice();
                     showMenu();
                     clearmouseclick(WM_LBUTTONDOWN);
@@ -2906,6 +3750,11 @@ void initHardPvcGame()
                         imin=i;
                     }
                 }
+                for (i=1; i<=mutari; i++)
+                {
+                    cout << v[i].pMoves << ' ';
+                }
+                cout << '\n';
                 delay(1500);
                 mutare(computer, v[imin].i1, v[imin].j1, v[imin].i2, v[imin].j2, v[imin].i3, v[imin].j3);
                 short nmin=v[imin].pMoves;
@@ -2973,9 +3822,20 @@ void initHardPvcGame()
             }
             else
             {
-                // display the choose L squares text
-                clickOnSquareTxt();
 
+                if (lang == 1)
+                {
+                    strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+                }
+                outtextxy(getmaxx()/2-150, 180, startText);
                 clearmouseclick(WM_LBUTTONDOWN);
 
                 while(1)
@@ -3059,10 +3919,11 @@ void initHardPvcGame()
                                 }
                             }
 
-                            // go to menu button
+                            // go back
                             else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                             {
                                 isMenu=1;
+                                isPvpGame=0;
                                 cleardevice();
                                 showMenu();
                             }
@@ -3080,9 +3941,21 @@ void initHardPvcGame()
                     }
                     else
                     {
-                        // display the can't create text
-                        cantCreateTxt();
-
+                        if (lang == 1)
+                        {
+                            strcpy(startText, "A new L can't be created using selected squares. Select other squares");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 220, startText);
                         startGame(xx, yy, zz, itsBg);
                         goToMenu();
                     }
@@ -3090,13 +3963,29 @@ void initHardPvcGame()
 
                 while(1)
                 {
+                    char readPieceTxt1[70], readPieceTxt2[70];
                     cleardevice();
                     startGame(xx, yy, zz, itsBg);
                     goToMenu();
-
-                    // display the move piece text
-                    movePieceTxt();
-
+                    if (lang == 1)
+                    {
+                        strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
+                        strcpy(readPieceTxt2, "right click to skip this step");
+                    }
+                    else if (lang == 2)
+                    {
+                        strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
+                        strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
+                    }
+                    else if (lang == 3)
+                    {
+                        strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
+                        strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
+                    }
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
+                    outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
                     clearmouseclick(WM_LBUTTONDOWN);
                     clearmouseclick(WM_RBUTTONDOWN);
                     do
@@ -3117,10 +4006,11 @@ void initHardPvcGame()
                                 clearmouseclick(WM_LBUTTONDOWN);
                             }
 
-                            // go to menu button
+                            // go back
                             else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                             {
                                 isMenu=1;
+                                isPvpGame=0;
                                 cleardevice();
                                 clearmouseclick(WM_LBUTTONDOWN);
                                 showMenu();
@@ -3144,8 +4034,21 @@ void initHardPvcGame()
                     {
                         if(M[in][jn]=='*')
                         {
-                            // display the choose free square text
-                            chooseSquareTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                             do
                             {
@@ -3158,10 +4061,11 @@ void initHardPvcGame()
                                         clearmouseclick(WM_LBUTTONDOWN);
                                     }
 
-                                    // go to menu button
+                                    // go back
                                     else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                     {
                                         isMenu=1;
+                                        isPvpGame=0;
                                         cleardevice();
                                         clearmouseclick(WM_LBUTTONDOWN);
                                         showMenu();
@@ -3183,17 +4087,42 @@ void initHardPvcGame()
                             }
                             else
                             {
-                                // display the position not free text
-                                posNotFreeTxt();
-
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                                 delay(2000);
                             }
                         }
 
                         else if(M[in][jn]=='#')
                         {
-                            // display the choose free square text
-                            chooseSquareTxt();
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
 
                             do
                             {
@@ -3206,10 +4135,11 @@ void initHardPvcGame()
                                         clearmouseclick(WM_LBUTTONDOWN);
                                     }
 
-                                    // go to menu button
+                                    // go back
                                     else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
                                     {
                                         isMenu=1;
+                                        isPvpGame=0;
                                         cleardevice();
                                         clearmouseclick(WM_LBUTTONDOWN);
                                         showMenu();
@@ -3231,9 +4161,21 @@ void initHardPvcGame()
                             }
                             else
                             {
-                                // display the position not free text
-                                posNotFreeTxt();
-
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
                                 delay(2000);
                             }
                         }
@@ -4044,7 +4986,7 @@ void showOptions()
                 showOptions();
             }
 
-            // go to menu button
+            // go back
             if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
             {
                 clearmouseclick(WM_LBUTTONDOWN);
@@ -4067,7 +5009,7 @@ void showInfo()
 
     do
     {
-        // go to menu button
+        // go back
         if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
         {
             clearmouseclick(WM_LBUTTONDOWN);
@@ -4085,7 +5027,6 @@ void showInfo()
 
 int main()
 {
-
     if (musicOn)
     {
         PlaySound(TEXT("miyagi_badabum.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
@@ -4093,11 +5034,6 @@ int main()
     initwindow(screenWidth, screenHeight, "BONOL", -3, -3);
     setbkcolor(itsBg);
     cleardevice();
-
-    if (getmaxx() >= 1600)
-        fsize=3;
-    else
-        fsize=2;
 
     showMenu();
 
