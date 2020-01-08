@@ -28,20 +28,26 @@ short pj3[]= {0, 1, 0, 2, 2, 0, 1, 0, 0, -1, 0, -2, -2, 0, -1, 0};
 // for menu
 bool isMenu=1;
 bool isChoosing=0;
+bool isChoosingDifficulty=0;
 bool isPvpGame=0;
 bool isPvcGame=0;
 bool isOptions=0;
 bool isInfo=0;
 void showMenu();
 void showGameChoosing();
+void showGameDiffChoosing();
 void showOptions();
 void showInfo();
 void initMenu();
 void initGameChoosing();
+void initGameDifficulty();
 void initPvpGame();
-void initPvcGame();
+void initEasyPvcGame();
+void initMediumPvcGame();
+void initHardPvcGame();
 void initOptions();
 void initInfo();
+void mutare(short player, short i1, short j1, short i2, short j2, short i3, short j3);
 
 // default language (1 for English, 2 for Romanian or 3 for French)
 short lang=1;
@@ -59,13 +65,23 @@ DWORD screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 struct piesaneutra
 {
-    short i,j;
+    short i, j;
 } stea, diez, liber[15];
 
 struct L
 {
     short i1, j1, i2, j2, i3, j3;
-} L1, L2, v[100];
+} L1, L2;
+
+struct hardMoves
+{
+    short pMoves, i1, j1, i2, j2, i3, j3;
+} v[20];
+
+struct liber
+{
+    short i, j, pMoves;
+} liberDiez[10], liberStea[10];
 
 void itsSquare(short a, short b, short c, short d, short e, int color)
 {
@@ -208,6 +224,84 @@ bool ok(short player, short i1, short j1, short i2, short j2, short i3, short j3
     return true;
 }
 
+bool okPvc(short player, short i1, short j1, short i2, short j2, short i3, short j3, short x, short y, char neutralPiece)
+{
+    if(i1<1 || i1>4 || j1<1 || j1>4 || i2<1 || i2>4 || j2<1 || j2>4 || i3<1 || i3>4 || j3<1 || j3>4)
+        return false;
+    short i, j, vecini, k, st=0, diz=0, unu=0, doi=0, k1, k2;
+    char N[6][6];
+    for(i=1; i<=4; i++)
+        for(j=1; j<=4; j++)
+            N[i][j]=M[i][j];
+    N[i1][j1]=N[i2][j2]=N[i3][j3]='$';
+    if (neutralPiece == '*')
+    {
+        N[x][y]=neutralPiece;
+        N[stea.i][stea.j]='0';
+    }
+    else
+    {
+        N[x][y]=neutralPiece;
+        N[diez.i][diez.j]='0';
+    }
+    for(i=1; i<=4; i++)
+    {
+        for(j=1; j<=4; j++)
+        {
+            vecini=0;
+            k1=k2=-1;
+            for(k=0; k<4; k++)
+            {
+                if(N[i+dl[k]][j+dc[k]]=='$')
+                {
+                    if(k1==-1)
+                        k1=k;
+                    else
+                        k2=k;
+                    vecini++;
+                }
+                if(vecini==2)
+                {
+                    if(k2-k1!=2)
+                        return false;
+                    if(N[i-1][j-1]!='$' && N[i-1][j+1]!='$' && N[i+1][j-1]!='$' && N[i+1][j+1]!='$')
+                        return false;
+                    N[i][j]='$';
+                    i=j=10;
+                    break;
+                }
+            }
+        }
+    }
+    if(i!=11)
+        return false;
+    for(i=1; i<=4; i++)
+    {
+        for(j=1; j<=4; j++)
+        {
+            if(N[i][j]=='*')
+                st=1;
+            if(N[i][j]=='#')
+                diz=1;
+            if(N[i][j]=='1')
+                unu++;
+            if(N[i][j]=='2')
+                doi++;
+        }
+    }
+    if(player==1)
+    {
+        if(doi!=4 || st==0 || diz==0 || unu==0)
+            return false;
+    }
+    else
+    {
+        if(unu!=4 || st==0 || diz==0 || doi==0)
+            return false;
+    }
+    return true;
+}
+
 int mutariposibile(short player)
 {
     short i, j, nr=0, k, pi, pj;
@@ -274,6 +368,206 @@ int mutariposibile(short player)
                             if(ok(2, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]))
                                 nr++;
                             if(ok(2, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]))
+                                nr++;
+                            C[i][j]='%';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return nr;
+}
+
+int possibleMoves(short player, short i1, short j1, short i2, short j2, short i3, short j3)
+{
+    short i, j, nr=0, k, pi, pj;
+    char C[6][6], A[6][6];
+    for (i=1; i<=4; i++)
+    {
+        for (j=1; j<=4; j++)
+        {
+            A[i][j]=M[i][j];
+            cout << A[i][j] << ' ';
+        }
+        cout << '\n';
+    }
+    cout << '\n';
+    mutare(3-player, i1, j1, i2, j2, i3, j3);
+    for (i=1; i<=4; i++)
+    {
+        for (j=1; j<=4; j++)
+        {
+            cout << M[i][j] << ' ';
+        }
+        cout << '\n';
+    }
+    if(player==1)
+    {
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(M[i][j]!='1')
+                    C[i][j]=M[i][j];
+                else
+                    C[i][j]='0';
+            }
+        }
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(C[i][j]=='0')
+                {
+                    for(k=0; k<8; k++)
+                    {
+                        pi=i+lin[k];
+                        pj=j+col[k];
+                        if(C[pi][pj]=='0')
+                        {
+                            if(ok(1, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]))
+                                nr++;
+                            if(ok(1, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]))
+                                nr++;
+                            C[i][j]='%';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(M[i][j]!='2')
+                    C[i][j]=M[i][j];
+                else
+                    C[i][j]='0';
+            }
+        }
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(C[i][j]=='0')
+                {
+                    for(k=0; k<8; k++)
+                    {
+                        pi=i+lin[k];
+                        pj=j+col[k];
+                        if(C[pi][pj]=='0')
+                        {
+                            if(ok(2, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]))
+                                nr++;
+                            if(ok(2, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]))
+                                nr++;
+                            C[i][j]='%';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for (i=1; i<=4; i++)
+    {
+        for (j=1; j<=4; j++)
+        {
+            M[i][j]=A[i][j];
+        }
+    }
+    return nr;
+}
+
+int mPosNeutPiece(short player, short x, short y, char neutralPiece)
+{
+    short i, j, nr=0, k, pi, pj;
+    char C[6][6];
+    if(player==1)
+    {
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(M[i][j]!='1')
+                    C[i][j]=M[i][j];
+                else
+                    C[i][j]='0';
+            }
+        }
+        if (neutralPiece == '*')
+        {
+            C[x][y]=neutralPiece;
+            C[stea.i][stea.j]='0';
+        }
+        else
+        {
+            C[x][y]=neutralPiece;
+            C[diez.i][diez.j]='0';
+        }
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(C[i][j]=='0')
+                {
+                    for(k=0; k<8; k++)
+                    {
+                        pi=i+lin[k];
+                        pj=j+col[k];
+                        if(C[pi][pj]=='0')
+                        {
+                            if(okPvc(1, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k], x, y, neutralPiece))
+                                nr++;
+                            if(okPvc(1, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1], x, y, neutralPiece))
+                                nr++;
+                            C[i][j]='%';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(M[i][j]!='2')
+                    C[i][j]=M[i][j];
+                else
+                    C[i][j]='0';
+            }
+        }
+        if (neutralPiece == '*')
+        {
+            C[x][y]=neutralPiece;
+            C[stea.i][stea.j]='0';
+        }
+        else
+        {
+            C[x][y]=neutralPiece;
+            C[diez.i][diez.j]='0';
+        }
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(C[i][j]=='0')
+                {
+                    for(k=0; k<8; k++)
+                    {
+                        pi=i+lin[k];
+                        pj=j+col[k];
+                        if(C[pi][pj]=='0')
+                        {
+                            if(okPvc(2, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k], x, y, neutralPiece))
+                                nr++;
+                            if(okPvc(2, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1], x, y, neutralPiece))
                                 nr++;
                             C[i][j]='%';
                         }
@@ -383,6 +677,119 @@ int mutariPosibilePvc(short player)
                                 v[nr].j2=pj;
                                 v[nr].i3=i+pi3[2*k+1];
                                 v[nr].j3=j+pj3[2*k+1];
+                            }
+                            C[i][j]='%';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return nr;
+}
+
+int mutariPosibileHardPvc(short player)
+{
+    short i, j, nr=0, k, pi, pj;
+    char C[6][6];
+    if(player==1)
+    {
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(M[i][j]!='1')
+                    C[i][j]=M[i][j];
+                else
+                    C[i][j]='0';
+            }
+        }
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(C[i][j]=='0')
+                {
+                    for(k=0; k<8; k++)
+                    {
+                        pi=i+lin[k];
+                        pj=j+col[k];
+                        if(C[pi][pj]=='0')
+                        {
+                            if(ok(1, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]))
+                            {
+                                nr++;
+                                v[nr].i1=i;
+                                v[nr].j1=j;
+                                v[nr].i2=pi;
+                                v[nr].j2=pj;
+                                v[nr].i3=i+pi3[2*k];
+                                v[nr].j3=j+pj3[2*k];
+                                v[nr].pMoves=possibleMoves(3-player, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]);
+                            }
+                            if(ok(1, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]))
+                            {
+                                nr++;
+                                v[nr].i1=i;
+                                v[nr].j1=j;
+                                v[nr].i2=pi;
+                                v[nr].j2=pj;
+                                v[nr].i3=i+pi3[2*k+1];
+                                v[nr].j3=j+pj3[2*k+1];
+                                v[nr].pMoves=possibleMoves(3-player, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]);
+                            }
+                            C[i][j]='%';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(M[i][j]!='2')
+                    C[i][j]=M[i][j];
+                else
+                    C[i][j]='0';
+            }
+        }
+        for(i=1; i<=4; i++)
+        {
+            for(j=1; j<=4; j++)
+            {
+                if(C[i][j]=='0')
+                {
+                    for(k=0; k<8; k++)
+                    {
+                        pi=i+lin[k];
+                        pj=j+col[k];
+                        if(C[pi][pj]=='0')
+                        {
+                            if(ok(2, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]))
+                            {
+                                nr++;
+                                v[nr].i1=i;
+                                v[nr].j1=j;
+                                v[nr].i2=pi;
+                                v[nr].j2=pj;
+                                v[nr].i3=i+pi3[2*k];
+                                v[nr].j3=j+pj3[2*k];
+                                v[nr].pMoves=possibleMoves(3-player, i, j, pi, pj, i+pi3[2*k], j+pj3[2*k]);
+                            }
+                            if(ok(2, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]))
+                            {
+                                nr++;
+                                v[nr].i1=i;
+                                v[nr].j1=j;
+                                v[nr].i2=pi;
+                                v[nr].j2=pj;
+                                v[nr].i3=i+pi3[2*k+1];
+                                v[nr].j3=j+pj3[2*k+1];
+                                v[nr].pMoves=possibleMoves(3-player, i, j, pi, pj, i+pi3[2*k+1], j+pj3[2*k+1]);
                             }
                             C[i][j]='%';
                         }
@@ -703,6 +1110,93 @@ void initChooseButtons()
     else
     {
         drawButton(getmaxx()/11, getmaxy()/2+50, 5, itsBg, itsYellow, pvcTxt);
+    }
+}
+
+void initGameDifficulty()
+{
+    setcolor(WHITE);
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, 5);
+    char chooseGameDifficulty[30];
+
+    if (lang == 1)
+    {
+        strcpy(chooseGameDifficulty, "Choose game difficulty:");
+    }
+    else if (lang == 2)
+    {
+        strcpy(chooseGameDifficulty, "Alege dificultatea jocului:");
+    }
+    else if (lang == 3)
+    {
+        strcpy(chooseGameDifficulty, "Choisissez la difficulté du jeu:");
+    }
+    outtextxy(getmaxx()/2, getmaxy()/2-140, chooseGameDifficulty);
+
+    // add img
+    readimagefile("final_pos.jpg", getmaxx()/13.66, getmaxy()/3.2, getmaxx()/2.27, getmaxy()/1.42);
+
+    // go to menu button
+    goToMenu();
+}
+
+void initDifficultyButtons()
+{
+    delay(50);
+    char easyTxt[10], mediumTxt[10], hardTxt[10];
+
+    if (lang == 1)
+    {
+        strcpy(easyTxt, "Easy");
+        strcpy(mediumTxt, "Medium");
+        strcpy(hardTxt, "Hard");
+    }
+    else if (lang == 2)
+    {
+        strcpy(easyTxt, "Usor");
+        strcpy(mediumTxt, "Mediu");
+        strcpy(hardTxt, "Dificil");
+    }
+    else if (lang == 3)
+    {
+        strcpy(easyTxt, "Simple");
+        strcpy(mediumTxt, "Médium");
+        strcpy(hardTxt, "Difficile");
+    }
+
+    if (ismouseclick(WM_LBUTTONDOWN))
+    {
+        cout << mousex() << ' ' << mousey() << '\n';
+    }
+
+    // easy button
+    if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+195, getmaxy()/2-60, getmaxy()/2-8))
+    {
+       drawButton(getmaxx()/2+60, getmaxy()/2-60, 6, itsYellow, itsBg, easyTxt);
+    }
+    else
+    {
+        drawButton(getmaxx()/2+60, getmaxy()/2-60, 6, itsBg, itsYellow, easyTxt);
+    }
+
+    // medium button
+    if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+260, getmaxy()/2+20, getmaxy()/2+72))
+    {
+        drawButton(getmaxx()/2+60, getmaxy()/2+20, 6, itsYellow, itsBg, mediumTxt);
+    }
+    else
+    {
+        drawButton(getmaxx()/2+60, getmaxy()/2+20, 6, itsBg, itsYellow, mediumTxt);
+    }
+
+    // hard button
+    if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+195, getmaxy()/2+100, getmaxy()/2+152))
+    {
+        drawButton(getmaxx()/2+60, getmaxy()/2+100, 6, itsYellow, itsBg, hardTxt);
+    }
+    else
+    {
+        drawButton(getmaxx()/2+60, getmaxy()/2+100, 6, itsBg, itsYellow, hardTxt);
     }
 }
 
@@ -1353,7 +1847,7 @@ void initPvpGame()
     }
 }
 
-void initPvcGame()
+void initEasyPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short fsize, winsize, winy;
@@ -2116,6 +2610,1585 @@ void initPvcGame()
     }
 }
 
+
+void initMediumPvcGame()
+{
+    short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    short fsize, winsize, winy;
+    char startText[100], choiceText[100];
+    short mutari;
+    short in, jn, k1, k2;
+
+    // display the game table;
+    startConfig();
+    startGame(xx, yy, zz, itsBg);
+
+    setcolor(WHITE);
+
+    if (getmaxx() >= 1600)
+        fsize=3;
+    else
+        fsize=2;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which you want to be");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care vrei sa fii");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur que vous voulez être");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
+
+    short player;
+
+    while (1)
+    {
+        player=getch()-'0';
+        if (player == 1)
+        {
+            break;
+        }
+        else if (player == 2)
+        {
+            break;
+        }
+        else
+        {
+            cleardevice();
+            startGame(xx, yy, zz, itsBg);
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
+        }
+    }
+    cleardevice();
+
+    // display the game table;
+    startConfig();
+    startGame(xx, yy, zz, itsBg);
+
+    setcolor(WHITE);
+
+    short computer=3-player;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which will start the game");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care va muta primul");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur qui commencera le jeu");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
+
+    while (1)
+    {
+        player=getch()-'0';
+        if (player == 1)
+        {
+            break;
+        }
+        else if (player == 2)
+        {
+            break;
+        }
+        else
+        {
+            cleardevice();
+            startGame(xx, yy, zz, itsBg);
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
+        }
+    }
+
+    // go to menu button
+    goToMenu();
+
+    while(1)
+    {
+        char pTurnText[50];
+        if(player==1)
+        {
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player1);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player1);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player1);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
+        }
+        else
+        {
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player2);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player2);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player2);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
+        }
+
+        if (computer==player)
+        {
+            mutari=mutariPosibileHardPvc(computer);
+        }
+        else
+        {
+            mutari=mutariposibile(player);
+        }
+
+        char m1[3];
+        m1[0] = '0'+mutari/10;
+        m1[1] = '0'+mutari%10;
+        m1[2] = '\0';
+        char pMovesText[50];
+
+        if(player==1)
+        {
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
+        }
+        else
+        {
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
+        }
+
+        if(mutari==0)
+        {
+            char pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70];
+
+            if(player==1)
+            {
+                cleardevice();
+                strcpy(pWonTxt1, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
+            }
+            else
+            {
+                cleardevice();
+                strcpy(pWonTxt1, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
+            }
+
+            do
+            {
+                if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                {
+                    isMenu=1;
+                    isPvpGame=0;
+                    cleardevice();
+                    showMenu();
+                    clearmouseclick(WM_LBUTTONDOWN);
+                }
+                delay(5);
+            }
+            while (1);
+        }
+
+        else
+        {
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (player==computer)
+            {
+                short z=1, i, j, minim=100, imin=1;
+                for (i=1; i<=mutari; i++)
+                {
+                    if (v[i].pMoves < minim)
+                    {
+                        minim=v[i].pMoves;
+                        imin=i;
+                    }
+                }
+                delay(1500);
+                mutare(computer, v[imin].i1, v[imin].j1, v[imin].i2, v[imin].j2, v[imin].i3, v[imin].j3);
+                short neutralPiece = rand() % 3 + 1;
+                for (i=1; i<=4; i++)
+                {
+                    for (j=1; j<=4; j++)
+                    {
+                        if (M[i][j] == '0')
+                        {
+                            liber[z].i=i;
+                            liber[z].j=j;
+                            z++;
+                        }
+                    }
+                }
+                z--;
+                short randChoice = rand() % z + 1;
+                if (neutralPiece == 1)
+                {
+                    M[liber[randChoice].i][liber[randChoice].j]='*';
+                    M[stea.i][stea.j]='0';
+                    stea.i=liber[randChoice].i;
+                    stea.j=liber[randChoice].j;
+                }
+                else if (neutralPiece == 2)
+                {
+                    M[liber[randChoice].i][liber[randChoice].j]='#';
+                    M[diez.i][diez.j]='0';
+                    diez.i=liber[randChoice].i;
+                    diez.j=liber[randChoice].j;
+                }
+            }
+            else
+            {
+
+                if (lang == 1)
+                {
+                    strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+                }
+                outtextxy(getmaxx()/2-150, 180, startText);
+                clearmouseclick(WM_LBUTTONDOWN);
+
+                while(1)
+                {
+                    short nr=0;
+
+                    do
+                    {
+                        if (ismouseclick(WM_LBUTTONDOWN))
+                        {
+                            if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                            {
+                                nr++;
+
+                                if (nr == 1)
+                                {
+                                    i1=(mousey()-yy)/zz+1;
+                                    j1=(mousex()-xx)/zz+1;
+
+                                    if (M[i1][j1] == '1')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i1][j1] == '2')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i1][j1] == '0')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i1][j1] == '*' || M[i1][j1] == '#')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                }
+                                else if (nr == 2)
+                                {
+                                    i2=(mousey()-yy)/zz+1;
+                                    j2=(mousex()-xx)/zz+1;
+
+                                    if (M[i2][j2] == '1')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i2][j2] == '2')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i2][j2] == '0')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i2][j2] == '*' || M[i2][j2] == '#')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                }
+                                else if (nr == 3)
+                                {
+                                    i3=(mousey()-yy)/zz+1;
+                                    j3=(mousex()-xx)/zz+1;
+
+                                    if (M[i3][j3] == '1')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i3][j3] == '2')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i3][j3] == '0')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i3][j3] == '*' || M[i3][j3] == '#')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                    delay(500);
+                                }
+                            }
+
+                            // go back
+                            else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                            {
+                                isMenu=1;
+                                isPvpGame=0;
+                                cleardevice();
+                                showMenu();
+                            }
+
+                            clearmouseclick(WM_LBUTTONDOWN);
+                        }
+                        delay(5);
+                    }
+                    while (nr<3);
+
+                    if(ok(player,i1,j1,i2,j2,i3,j3))
+                    {
+                        mutare(player,i1,j1,i2,j2,i3,j3);
+                        break;
+                    }
+                    else
+                    {
+                        if (lang == 1)
+                        {
+                            strcpy(startText, "A new L can't be created using selected squares. Select other squares");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 220, startText);
+                        startGame(xx, yy, zz, itsBg);
+                        goToMenu();
+                    }
+                }
+
+                while(1)
+                {
+                    char readPieceTxt1[70], readPieceTxt2[70];
+                    cleardevice();
+                    startGame(xx, yy, zz, itsBg);
+                    goToMenu();
+                    if (lang == 1)
+                    {
+                        strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
+                        strcpy(readPieceTxt2, "right click to skip this step");
+                    }
+                    else if (lang == 2)
+                    {
+                        strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
+                        strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
+                    }
+                    else if (lang == 3)
+                    {
+                        strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
+                        strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
+                    }
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
+                    outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
+                    clearmouseclick(WM_LBUTTONDOWN);
+                    clearmouseclick(WM_RBUTTONDOWN);
+                    do
+                    {
+                        if (ismouseclick(WM_LBUTTONDOWN))
+                        {
+                            if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                            {
+                                in=(mousey()-yy)/zz+1;
+                                jn=(mousex()-xx)/zz+1;
+
+                                if (M[in][jn] == '*' || M[in][jn] == '#')
+                                {
+                                    drawSquare((in-1)*zz+1, (jn-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    setcolor(WHITE);
+                                }
+
+                                clearmouseclick(WM_LBUTTONDOWN);
+                            }
+
+                            // go back
+                            else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                            {
+                                isMenu=1;
+                                isPvpGame=0;
+                                cleardevice();
+                                clearmouseclick(WM_LBUTTONDOWN);
+                                showMenu();
+                            }
+
+                            break;
+                        }
+                        else if (ismouseclick(WM_RBUTTONDOWN))
+                        {
+                            in=jn=-1;
+                            clearmouseclick(WM_RBUTTONDOWN);
+                            break;
+                        }
+                        delay(5);
+                    }
+                    while (1);
+
+                    char newCoordTxt[75], notFreeTxt[75];
+
+                    if (in!=-1)
+                    {
+                        if(M[in][jn]=='*')
+                        {
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
+
+                            do
+                            {
+                                if (ismouseclick(WM_LBUTTONDOWN))
+                                {
+                                    if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                                    {
+                                        k1=(mousey()-yy)/zz+1;
+                                        k2=(mousex()-xx)/zz+1;
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                    }
+
+                                    // go back
+                                    else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                                    {
+                                        isMenu=1;
+                                        isPvpGame=0;
+                                        cleardevice();
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                        showMenu();
+                                    }
+
+                                    break;
+                                }
+                                delay(5);
+                            }
+                            while (1);
+
+                            if(M[k1][k2]=='0')
+                            {
+                                M[k1][k2]='*';
+                                M[stea.i][stea.j]='0';
+                                stea.i=k1;
+                                stea.j=k2;
+                                break;
+                            }
+                            else
+                            {
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
+                                delay(2000);
+                            }
+                        }
+
+                        else if(M[in][jn]=='#')
+                        {
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
+
+                            do
+                            {
+                                if (ismouseclick(WM_LBUTTONDOWN))
+                                {
+                                    if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                                    {
+                                        k1=(mousey()-yy)/zz+1;
+                                        k2=(mousex()-xx)/zz+1;
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                    }
+
+                                    // go back
+                                    else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                                    {
+                                        isMenu=1;
+                                        isPvpGame=0;
+                                        cleardevice();
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                        showMenu();
+                                    }
+
+                                    break;
+                                }
+                                delay(5);
+                            }
+                            while (1);
+
+                            if(M[k1][k2]=='0')
+                            {
+                                M[k1][k2]='#';
+                                M[diez.i][diez.j]='0';
+                                diez.i=k1;
+                                diez.j=k2;
+                                break;
+                            }
+                            else
+                            {
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
+                                delay(2000);
+                            }
+                        }
+                    }
+                    else
+                        break;
+                }
+            }
+        }
+        player=3-player;
+    }
+}
+
+void initHardPvcGame()
+{
+    short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    short fsize, winsize, winy;
+    char startText[100], choiceText[100];
+    short mutari;
+    short in, jn, k1, k2;
+
+    // display the game table;
+    startConfig();
+    startGame(xx, yy, zz, itsBg);
+
+    setcolor(WHITE);
+
+    if (getmaxx() >= 1600)
+        fsize=3;
+    else
+        fsize=2;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which you want to be");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care vrei sa fii");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur que vous voulez être");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
+
+    short player;
+
+    while (1)
+    {
+        player=getch()-'0';
+        if (player == 1)
+        {
+            break;
+        }
+        else if (player == 2)
+        {
+            break;
+        }
+        else
+        {
+            cleardevice();
+            startGame(xx, yy, zz, itsBg);
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
+        }
+    }
+    cleardevice();
+
+    // display the game table;
+    startConfig();
+    startGame(xx, yy, zz, itsBg);
+
+    setcolor(WHITE);
+
+    short computer=3-player;
+
+    if (lang == 1)
+    {
+        strcpy(startText, "Choose the player which will start the game");
+        strcpy(choiceText, "Button 1 for ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " or 2 for ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 2)
+    {
+        strcpy(startText, "Alege jucatorul care va muta primul");
+        strcpy(choiceText, "Tasta 1 pentru ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " sau 2 pentru ");
+        strcat(choiceText, player2);
+    }
+    else if (lang == 3)
+    {
+        strcpy(startText, "Choisissez le joueur qui commencera le jeu");
+        strcpy(choiceText, "Bouton 1 pour ");
+        strcat(choiceText, player1);
+        strcat(choiceText, " ou 2 pour ");
+        strcat(choiceText, player2);
+    }
+    outtextxy(getmaxx()/2-150, 100, startText);
+    outtextxy(getmaxx()/2-150, 140, choiceText);
+
+    while (1)
+    {
+        player=getch()-'0';
+        if (player == 1)
+        {
+            break;
+        }
+        else if (player == 2)
+        {
+            break;
+        }
+        else
+        {
+            cleardevice();
+            startGame(xx, yy, zz, itsBg);
+            setcolor(WHITE);
+            if (lang == 1)
+            {
+                strcpy(startText, "This player doesn't exist. Please type 1 or 2");
+            }
+            else if (lang == 2)
+            {
+                strcpy(startText, "Acest jucator nu exista. Va rugam tastati 1 sau 2");
+            }
+            else if (lang == 3)
+            {
+                strcpy(startText, "Ce joueur n'existe pas. Veuillez saisir 1 ou 2");
+            }
+            outtextxy(getmaxx()/2-150, 100, startText);
+        }
+    }
+
+    // go to menu button
+    goToMenu();
+
+    while(1)
+    {
+        char pTurnText[50];
+        if(player==1)
+        {
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player1);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player1);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player1);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
+        }
+        else
+        {
+            cleardevice();
+            if (lang == 1)
+            {
+                strcpy(pTurnText, "It's ");
+                strcat(pTurnText, player2);
+                strcat(pTurnText, "'s turn");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pTurnText, "Este randul lui ");
+                strcat(pTurnText, player2);
+            }
+            else if (lang == 3)
+            {
+                strcpy(pTurnText, "C'est au tour de ");
+                strcat(pTurnText, player2);
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 100, pTurnText);
+            startGame(xx, yy, zz, itsBg);
+            goToMenu();
+        }
+
+        if (computer==player)
+        {
+            mutari=mutariPosibileHardPvc(computer);
+        }
+        else
+        {
+            mutari=mutariposibile(player);
+        }
+
+        char m1[3];
+        m1[0] = '0'+mutari/10;
+        m1[1] = '0'+mutari%10;
+        m1[2] = '\0';
+        char pMovesText[50];
+
+        if(player==1)
+        {
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player1);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
+        }
+        else
+        {
+            if (lang == 1)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " has ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " moves");
+            }
+            else if (lang == 2)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " are ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mutari");
+            }
+            else if (lang == 3)
+            {
+                strcpy(pMovesText, player2);
+                strcat(pMovesText, " a ");
+                strcat(pMovesText, m1);
+                strcat(pMovesText, " mouvements");
+            }
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            outtextxy(getmaxx()/2-150, 140, pMovesText);
+        }
+
+        if(mutari==0)
+        {
+            char pWonTxt1[20], pWonTxt2[20], goToMenuTxt[70];
+
+            if(player==1)
+            {
+                cleardevice();
+                strcpy(pWonTxt1, player2);
+                setcolor(player2Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
+            }
+            else
+            {
+                cleardevice();
+                strcpy(pWonTxt1, player1);
+                setcolor(player1Color);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, 7);
+                outtextxy(getmaxx()/2-150, 100, pWonTxt1);
+                if (lang == 1)
+                {
+                    strcpy(pWonTxt2, "has won!!!");
+                    strcpy(goToMenuTxt, "Click on 'Menu' button to go to the menu");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(pWonTxt2, "a castigat!!!");
+                    strcpy(goToMenuTxt, "Click pe 'Meniu' pentru a te intoarce in meniu");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(pWonTxt2, "a gagne!!!");
+                    strcpy(goToMenuTxt, "Cliquez sur le 'Menu' pour accéder au menu");
+                }
+                outtextxy(getmaxx()/2-150, 160, pWonTxt2);
+                setcolor(WHITE);
+                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                outtextxy(getmaxx()/2-150, 240, goToMenuTxt);
+                startGame(xx, yy, zz, itsBg);
+                goToMenu();
+            }
+
+            do
+            {
+                if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                {
+                    isMenu=1;
+                    isPvpGame=0;
+                    cleardevice();
+                    showMenu();
+                    clearmouseclick(WM_LBUTTONDOWN);
+                }
+                delay(5);
+            }
+            while (1);
+        }
+
+        else
+        {
+            setcolor(WHITE);
+            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+            if (player==computer)
+            {
+                short z=0, i, j, minim=100, imin=1;
+                for (i=1; i<=mutari; i++)
+                {
+                    if (v[i].pMoves < minim)
+                    {
+                        minim=v[i].pMoves;
+                        imin=i;
+                    }
+                }
+                for (i=1; i<=mutari; i++)
+                {
+                    cout << v[i].pMoves << ' ';
+                }
+                cout << '\n';
+                delay(1500);
+                mutare(computer, v[imin].i1, v[imin].j1, v[imin].i2, v[imin].j2, v[imin].i3, v[imin].j3);
+                short nmin=v[imin].pMoves;
+                for (i=1; i<=4; i++)
+                {
+                    for (j=1; j<=4; j++)
+                    {
+                        if (M[i][j] == '0')
+                        {
+                            z++;
+                            liberStea[z].i=i;
+                            liberStea[z].j=j;
+                            liberStea[z].pMoves=mPosNeutPiece(3-computer, i, j, '*');
+                        }
+                    }
+                }
+                z=0;
+                for (i=1; i<=4; i++)
+                {
+                    for (j=1; j<=4; j++)
+                    {
+                        if (M[i][j] == '0')
+                        {
+                            z++;
+                            liberDiez[z].i=i;
+                            liberDiez[z].j=j;
+                            liberDiez[z].pMoves=mPosNeutPiece(3-computer, i, j, '#');
+                        }
+                    }
+                }
+                imin=-1;
+                short neutralPiece=3;
+                for (i=1; i<=6; i++)
+                {
+                    if (liberStea[i].pMoves < nmin)
+                    {
+                        nmin=liberStea[i].pMoves;
+                        imin=i;
+                        neutralPiece=1;
+                    }
+                }
+                for (i=1; i<=6; i++)
+                {
+                    if (liberDiez[i].pMoves < nmin)
+                    {
+                        nmin=liberDiez[i].pMoves;
+                        imin=i;
+                        neutralPiece=2;
+                    }
+                }
+                if (neutralPiece == 1)
+                {
+                    M[liberStea[imin].i][liberStea[imin].j]='*';
+                    M[stea.i][stea.j]='0';
+                    stea.i=liberStea[imin].i;
+                    stea.j=liberStea[imin].j;
+                }
+                else if (neutralPiece == 2)
+                {
+                    M[liberDiez[imin].i][liberDiez[imin].j]='#';
+                    M[diez.i][diez.j]='0';
+                    diez.i=liberDiez[imin].i;
+                    diez.j=liberDiez[imin].j;
+                }
+            }
+            else
+            {
+
+                if (lang == 1)
+                {
+                    strcpy(startText, "Click on 3 squares: 2 ends and the corner of new L");
+                }
+                else if (lang == 2)
+                {
+                    strcpy(startText, "Click pe 3 patratele: 2 capete si coltul noului L");
+                }
+                else if (lang == 3)
+                {
+                    strcpy(startText, "Cliquez sur 3 carrés: 2 extrémités et le coin du nouveau L");
+                }
+                outtextxy(getmaxx()/2-150, 180, startText);
+                clearmouseclick(WM_LBUTTONDOWN);
+
+                while(1)
+                {
+                    short nr=0;
+
+                    do
+                    {
+                        if (ismouseclick(WM_LBUTTONDOWN))
+                        {
+                            if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                            {
+                                nr++;
+
+                                if (nr == 1)
+                                {
+                                    i1=(mousey()-yy)/zz+1;
+                                    j1=(mousex()-xx)/zz+1;
+
+                                    if (M[i1][j1] == '1')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i1][j1] == '2')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i1][j1] == '0')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i1][j1] == '*' || M[i1][j1] == '#')
+                                    {
+                                        drawSquare((i1-1)*zz+1, (j1-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                }
+                                else if (nr == 2)
+                                {
+                                    i2=(mousey()-yy)/zz+1;
+                                    j2=(mousex()-xx)/zz+1;
+
+                                    if (M[i2][j2] == '1')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i2][j2] == '2')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i2][j2] == '0')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i2][j2] == '*' || M[i2][j2] == '#')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                }
+                                else if (nr == 3)
+                                {
+                                    i3=(mousey()-yy)/zz+1;
+                                    j3=(mousex()-xx)/zz+1;
+
+                                    if (M[i3][j3] == '1')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i3][j3] == '2')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i3][j3] == '0')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i3][j3] == '*' || M[i3][j3] == '#')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                    delay(500);
+                                }
+                            }
+
+                            // go back
+                            else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                            {
+                                isMenu=1;
+                                isPvpGame=0;
+                                cleardevice();
+                                showMenu();
+                            }
+
+                            clearmouseclick(WM_LBUTTONDOWN);
+                        }
+                        delay(5);
+                    }
+                    while (nr<3);
+
+                    if(ok(player,i1,j1,i2,j2,i3,j3))
+                    {
+                        mutare(player,i1,j1,i2,j2,i3,j3);
+                        break;
+                    }
+                    else
+                    {
+                        if (lang == 1)
+                        {
+                            strcpy(startText, "A new L can't be created using selected squares. Select other squares");
+                        }
+                        else if (lang == 2)
+                        {
+                            strcpy(startText, "Nu se poate forma un nou L cu patratele selectate. Alege alte patrate");
+                        }
+                        else if (lang == 3)
+                        {
+                            strcpy(startText, "Un nouveau L ne peut pas être créé. Sélectionnez d'autres carrés");
+                        }
+                        setcolor(WHITE);
+                        settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                        outtextxy(getmaxx()/2-150, 220, startText);
+                        startGame(xx, yy, zz, itsBg);
+                        goToMenu();
+                    }
+                }
+
+                while(1)
+                {
+                    char readPieceTxt1[70], readPieceTxt2[70];
+                    cleardevice();
+                    startGame(xx, yy, zz, itsBg);
+                    goToMenu();
+                    if (lang == 1)
+                    {
+                        strcpy(readPieceTxt1, "Click on neutral piece which you want to move or use");
+                        strcpy(readPieceTxt2, "right click to skip this step");
+                    }
+                    else if (lang == 2)
+                    {
+                        strcpy(readPieceTxt1, "Click pe piesa neutra pe care doresti sa o muti sau");
+                        strcpy(readPieceTxt2, "click dreapta pentru a sari peste acest pas");
+                    }
+                    else if (lang == 3)
+                    {
+                        strcpy(readPieceTxt1, "Cliquez sur la pièce neutre que vous souhaitez déplacer");
+                        strcpy(readPieceTxt2, "ou utilisez le clic droit pour ignorer cette étape");
+                    }
+                    setcolor(WHITE);
+                    settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                    outtextxy(getmaxx()/2-150, 100, readPieceTxt1);
+                    outtextxy(getmaxx()/2-150, 140, readPieceTxt2);
+                    clearmouseclick(WM_LBUTTONDOWN);
+                    clearmouseclick(WM_RBUTTONDOWN);
+                    do
+                    {
+                        if (ismouseclick(WM_LBUTTONDOWN))
+                        {
+                            if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                            {
+                                in=(mousey()-yy)/zz+1;
+                                jn=(mousex()-xx)/zz+1;
+
+                                if (M[in][jn] == '*' || M[in][jn] == '#')
+                                {
+                                    drawSquare((in-1)*zz+1, (jn-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    setcolor(WHITE);
+                                }
+
+                                clearmouseclick(WM_LBUTTONDOWN);
+                            }
+
+                            // go back
+                            else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                            {
+                                isMenu=1;
+                                isPvpGame=0;
+                                cleardevice();
+                                clearmouseclick(WM_LBUTTONDOWN);
+                                showMenu();
+                            }
+
+                            break;
+                        }
+                        else if (ismouseclick(WM_RBUTTONDOWN))
+                        {
+                            in=jn=-1;
+                            clearmouseclick(WM_RBUTTONDOWN);
+                            break;
+                        }
+                        delay(5);
+                    }
+                    while (1);
+
+                    char newCoordTxt[75], notFreeTxt[75];
+
+                    if (in!=-1)
+                    {
+                        if(M[in][jn]=='*')
+                        {
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
+
+                            do
+                            {
+                                if (ismouseclick(WM_LBUTTONDOWN))
+                                {
+                                    if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                                    {
+                                        k1=(mousey()-yy)/zz+1;
+                                        k2=(mousex()-xx)/zz+1;
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                    }
+
+                                    // go back
+                                    else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                                    {
+                                        isMenu=1;
+                                        isPvpGame=0;
+                                        cleardevice();
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                        showMenu();
+                                    }
+
+                                    break;
+                                }
+                                delay(5);
+                            }
+                            while (1);
+
+                            if(M[k1][k2]=='0')
+                            {
+                                M[k1][k2]='*';
+                                M[stea.i][stea.j]='0';
+                                stea.i=k1;
+                                stea.j=k2;
+                                break;
+                            }
+                            else
+                            {
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
+                                delay(2000);
+                            }
+                        }
+
+                        else if(M[in][jn]=='#')
+                        {
+                            if (lang == 1)
+                            {
+                                strcpy(newCoordTxt, "Choose a new free square where do you want to move the piece");
+                            }
+                            else if (lang == 2)
+                            {
+                                strcpy(newCoordTxt, "Alege un patrat liber unde doresti sa muti piesa neutra");
+                            }
+                            else if (lang == 3)
+                            {
+                                strcpy(newCoordTxt, "Choisissez un nouveau carré libre où voulez-vous déplacer la pièce");
+                            }
+                            setcolor(WHITE);
+                            settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                            outtextxy(getmaxx()/2-150, 180, newCoordTxt);
+
+                            do
+                            {
+                                if (ismouseclick(WM_LBUTTONDOWN))
+                                {
+                                    if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
+                                    {
+                                        k1=(mousey()-yy)/zz+1;
+                                        k2=(mousex()-xx)/zz+1;
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                    }
+
+                                    // go back
+                                    else if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                                    {
+                                        isMenu=1;
+                                        isPvpGame=0;
+                                        cleardevice();
+                                        clearmouseclick(WM_LBUTTONDOWN);
+                                        showMenu();
+                                    }
+
+                                    break;
+                                }
+                                delay(5);
+                            }
+                            while (1);
+
+                            if(M[k1][k2]=='0')
+                            {
+                                M[k1][k2]='#';
+                                M[diez.i][diez.j]='0';
+                                diez.i=k1;
+                                diez.j=k2;
+                                break;
+                            }
+                            else
+                            {
+                                if (lang == 1)
+                                {
+                                    strcpy(notFreeTxt, "The position is not free, choose another one");
+                                }
+                                else if (lang == 2)
+                                {
+                                    strcpy(notFreeTxt, "Pozitia este deja ocupata, alege alta pozitie");
+                                }
+                                else if (lang == 3)
+                                {
+                                    strcpy(notFreeTxt, "Le poste n'est pas libre, choisissez-en un autre");
+                                }
+                                setcolor(WHITE);
+                                settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
+                                outtextxy(getmaxx()/2-150, 220, notFreeTxt);
+                                delay(2000);
+                            }
+                        }
+                    }
+                    else
+                        break;
+                }
+            }
+        }
+        player=3-player;
+    }
+}
+
 void initOptions()
 {
     char gameOptionsTxt[20], gameLangTxt[20], gameSongTxt[20], pOneTxt[20], pTwoTxt[20];
@@ -2403,10 +4476,8 @@ void showMenu()
         {
             clearmouseclick(WM_LBUTTONDOWN);
             isMenu=0;
-            //isGame=1;
             isChoosing=1;
             cleardevice();
-            //initGame();
             showGameChoosing();
         }
 
@@ -2469,27 +4540,82 @@ void showGameChoosing()
             {
                 clearmouseclick(WM_LBUTTONDOWN);
                 isChoosing=0;
+                isChoosingDifficulty=1;
                 cleardevice();
-                initPvcGame();
+                showGameDiffChoosing();
             }
 
-            // go back
+            // go to menu
             if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
             {
                 clearmouseclick(WM_LBUTTONDOWN);
                 isMenu=1;
-                isOptions=0;
+                isChoosing=0;
                 cleardevice();
                 showMenu();
             }
         }
-
 
         // prevent some click bugs
         clearmouseclick(WM_LBUTTONDOWN);
         delay(5);
     }
     while (isChoosing == 1);
+}
+
+void showGameDiffChoosing()
+{
+    initGameDifficulty();
+
+    do
+    {
+        initDifficultyButtons();
+        setbkcolor(itsBg);
+
+        if (ismouseclick(WM_LBUTTONDOWN))
+        {
+            // easy button
+            if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+195, getmaxy()/2-60, getmaxy()/2-8))
+            {
+                clearmouseclick(WM_LBUTTONDOWN);
+                isChoosingDifficulty=0;
+                cleardevice();
+                initEasyPvcGame();
+            }
+
+            // medium button
+            if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+260, getmaxy()/2+20, getmaxy()/2+72))
+            {
+                clearmouseclick(WM_LBUTTONDOWN);
+                isChoosingDifficulty=0;
+                cleardevice();
+                initMediumPvcGame();
+            }
+
+            // hard button
+            if (checkClick(mousex(), mousey(), getmaxx()/2+60, getmaxx()/2+195, getmaxy()/2+100, getmaxy()/2+152))
+            {
+                clearmouseclick(WM_LBUTTONDOWN);
+                isChoosingDifficulty=0;
+                cleardevice();
+                initHardPvcGame();
+            }
+
+            // go to menu
+            if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+            {
+                clearmouseclick(WM_LBUTTONDOWN);
+                isMenu=1;
+                isChoosingDifficulty=0;
+                cleardevice();
+                showMenu();
+            }
+        }
+        // prevent some click bugs
+        clearmouseclick(WM_LBUTTONDOWN);
+        delay(5);
+    }
+    while (isChoosingDifficulty == 1);
 }
 
 void showOptions()
@@ -2616,8 +4742,8 @@ void showOptions()
                 }
                 else if (songNr == 3)
                 {
-                    strcpy(songName, "Rihanna - BITCH better have my money");
-                    PlaySound(TEXT("rihanna_b_better_have_my_money.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                    strcpy(songName, "Clandestina - Cocaina");
+                    PlaySound(TEXT("clandestina_cocaina.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
                 }
                 cleardevice();
                 showOptions();
@@ -2642,8 +4768,8 @@ void showOptions()
                 }
                 else if (songNr == 3)
                 {
-                    strcpy(songName, "Rihanna - BITCH better have my money");
-                    PlaySound(TEXT("rihanna_b_better_have_my_money.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                    strcpy(songName, "Clandestina - Cocaina");
+                    PlaySound(TEXT("clandestina_cocaina.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
                 }
 
                 cleardevice();
