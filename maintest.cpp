@@ -53,7 +53,7 @@ void mutare(short player, short i1, short j1, short i2, short j2, short i3, shor
 short lang=1;
 
 // music is on/off by default
-bool musicOn=1;
+bool musicOn=0;
 
 // default song name and number
 char songName[50] = "Miyagi - Badabum";

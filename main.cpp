@@ -1266,21 +1266,21 @@ void possibleMovesTxt(char player[20], char moves[3])
         strcpy(pMovesText, player);
         strcat(pMovesText, " has ");
         strcat(pMovesText, moves);
-        strcat(pMovesText, " moves");
+        strcat(pMovesText, " possible moves");
     }
     else if (lang == 2)
     {
         strcpy(pMovesText, player);
         strcat(pMovesText, " are ");
         strcat(pMovesText, moves);
-        strcat(pMovesText, " mutari");
+        strcat(pMovesText, " mutari posibile");
     }
     else if (lang == 3)
     {
         strcpy(pMovesText, player);
         strcat(pMovesText, " a ");
         strcat(pMovesText, moves);
-        strcat(pMovesText, " mouvements");
+        strcat(pMovesText, " mouvements possibles");
     }
     setcolor(WHITE);
     settextstyle(COMPLEX_FONT, HORIZ_DIR, fsize);
@@ -1599,21 +1599,28 @@ void initPvpGame()
                                 i2=(mousey()-yy)/zz+1;
                                 j2=(mousex()-xx)/zz+1;
 
-                                if (M[i2][j2] == '1')
+                                if (i1!=i2 || j1!=j2)
                                 {
-                                    drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    if (M[i2][j2] == '1')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i2][j2] == '2')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i2][j2] == '0')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i2][j2] == '*' || M[i2][j2] == '#')
+                                    {
+                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
                                 }
-                                else if (M[i2][j2] == '2')
+                                else
                                 {
-                                    drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
-                                }
-                                else if (M[i2][j2] == '0')
-                                {
-                                    drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                }
-                                else if (M[i2][j2] == '*' || M[i2][j2] == '#')
-                                {
-                                    drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    nr--;
                                 }
                             }
                             else if (nr == 3)
@@ -1621,23 +1628,30 @@ void initPvpGame()
                                 i3=(mousey()-yy)/zz+1;
                                 j3=(mousex()-xx)/zz+1;
 
-                                if (M[i3][j3] == '1')
+                                if ((i3!=i2 && i3!=i1) || (j3!=i2 && j3!=j1))
                                 {
-                                    drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    if (M[i3][j3] == '1')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                    }
+                                    else if (M[i3][j3] == '2')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    }
+                                    else if (M[i3][j3] == '0')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                    }
+                                    else if (M[i3][j3] == '*' || M[i3][j3] == '#')
+                                    {
+                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                    }
+                                    delay(500);
                                 }
-                                else if (M[i3][j3] == '2')
+                                else
                                 {
-                                    drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                    nr--;
                                 }
-                                else if (M[i3][j3] == '0')
-                                {
-                                    drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                }
-                                else if (M[i3][j3] == '*' || M[i3][j3] == '#')
-                                {
-                                    drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
-                                }
-                                delay(500);
                             }
                         }
 
@@ -2057,21 +2071,28 @@ void initEasyPvcGame()
                                     i2=(mousey()-yy)/zz+1;
                                     j2=(mousex()-xx)/zz+1;
 
-                                    if (M[i2][j2] == '1')
+                                    if (i2!=i1 || j2!=j1)
                                     {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        if (M[i2][j2] == '1')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        }
+                                        else if (M[i2][j2] == '2')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        }
+                                        else if (M[i2][j2] == '0')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                        }
+                                        else if (M[i2][j2] == '*' || M[i2][j2] == '#')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        }
                                     }
-                                    else if (M[i2][j2] == '2')
+                                    else
                                     {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
-                                    }
-                                    else if (M[i2][j2] == '0')
-                                    {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                    }
-                                    else if (M[i2][j2] == '*' || M[i2][j2] == '#')
-                                    {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        nr--;
                                     }
                                 }
                                 else if (nr == 3)
@@ -2079,23 +2100,30 @@ void initEasyPvcGame()
                                     i3=(mousey()-yy)/zz+1;
                                     j3=(mousex()-xx)/zz+1;
 
-                                    if (M[i3][j3] == '1')
+                                    if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
                                     {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        if (M[i3][j3] == '1')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        }
+                                        else if (M[i3][j3] == '2')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        }
+                                        else if (M[i3][j3] == '0')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                        }
+                                        else if (M[i3][j3] == '*' || M[i3][j3] == '#')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        }
+                                        delay(500);
                                     }
-                                    else if (M[i3][j3] == '2')
+                                    else
                                     {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        nr--;
                                     }
-                                    else if (M[i3][j3] == '0')
-                                    {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                    }
-                                    else if (M[i3][j3] == '*' || M[i3][j3] == '#')
-                                    {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
-                                    }
-                                    delay(500);
                                 }
                             }
 
@@ -2522,21 +2550,28 @@ void initMediumPvcGame()
                                     i2=(mousey()-yy)/zz+1;
                                     j2=(mousex()-xx)/zz+1;
 
-                                    if (M[i2][j2] == '1')
+                                    if (i2!=i1 || j2!=j1)
                                     {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        if (M[i2][j2] == '1')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        }
+                                        else if (M[i2][j2] == '2')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        }
+                                        else if (M[i2][j2] == '0')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                        }
+                                        else if (M[i2][j2] == '*' || M[i2][j2] == '#')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        }
                                     }
-                                    else if (M[i2][j2] == '2')
+                                    else
                                     {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
-                                    }
-                                    else if (M[i2][j2] == '0')
-                                    {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                    }
-                                    else if (M[i2][j2] == '*' || M[i2][j2] == '#')
-                                    {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        nr--;
                                     }
                                 }
                                 else if (nr == 3)
@@ -2544,23 +2579,30 @@ void initMediumPvcGame()
                                     i3=(mousey()-yy)/zz+1;
                                     j3=(mousex()-xx)/zz+1;
 
-                                    if (M[i3][j3] == '1')
+                                    if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
                                     {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        if (M[i3][j3] == '1')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        }
+                                        else if (M[i3][j3] == '2')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        }
+                                        else if (M[i3][j3] == '0')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                        }
+                                        else if (M[i3][j3] == '*' || M[i3][j3] == '#')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        }
+                                        delay(500);
                                     }
-                                    else if (M[i3][j3] == '2')
+                                    else
                                     {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        nr--;
                                     }
-                                    else if (M[i3][j3] == '0')
-                                    {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                    }
-                                    else if (M[i3][j3] == '*' || M[i3][j3] == '#')
-                                    {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
-                                    }
-                                    delay(500);
                                 }
                             }
 
@@ -3017,21 +3059,28 @@ void initHardPvcGame()
                                     i2=(mousey()-yy)/zz+1;
                                     j2=(mousex()-xx)/zz+1;
 
-                                    if (M[i2][j2] == '1')
+                                    if (i2!=i1 || j2!=j1)
                                     {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        if (M[i2][j2] == '1')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        }
+                                        else if (M[i2][j2] == '2')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        }
+                                        else if (M[i2][j2] == '0')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                        }
+                                        else if (M[i2][j2] == '*' || M[i2][j2] == '#')
+                                        {
+                                            drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        }
                                     }
-                                    else if (M[i2][j2] == '2')
+                                    else
                                     {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, player2ClickColor);
-                                    }
-                                    else if (M[i2][j2] == '0')
-                                    {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                    }
-                                    else if (M[i2][j2] == '*' || M[i2][j2] == '#')
-                                    {
-                                        drawSquare((i2-1)*zz+1, (j2-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        nr--;
                                     }
                                 }
                                 else if (nr == 3)
@@ -3039,23 +3088,30 @@ void initHardPvcGame()
                                     i3=(mousey()-yy)/zz+1;
                                     j3=(mousex()-xx)/zz+1;
 
-                                    if (M[i3][j3] == '1')
+                                    if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
                                     {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        if (M[i3][j3] == '1')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player1ClickColor);
+                                        }
+                                        else if (M[i3][j3] == '2')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        }
+                                        else if (M[i3][j3] == '0')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
+                                        }
+                                        else if (M[i3][j3] == '*' || M[i3][j3] == '#')
+                                        {
+                                            drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
+                                        }
+                                        delay(500);
                                     }
-                                    else if (M[i3][j3] == '2')
+                                    else
                                     {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, player2ClickColor);
+                                        nr--;
                                     }
-                                    else if (M[i3][j3] == '0')
-                                    {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(150, 150, 150));
-                                    }
-                                    else if (M[i3][j3] == '*' || M[i3][j3] == '#')
-                                    {
-                                        drawSquare((i3-1)*zz+1, (j3-1)*zz+1, xx, yy, zz, COLOR(151, 143, 2));
-                                    }
-                                    delay(500);
                                 }
                             }
 
