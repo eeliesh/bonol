@@ -1599,7 +1599,7 @@ void initPvpGame()
                                 i2=(mousey()-yy)/zz+1;
                                 j2=(mousex()-xx)/zz+1;
 
-                                if (i1!=i2 || j1!=j2)
+                                if (i2!=1 || j2!=j1)
                                 {
                                     if (M[i2][j2] == '1')
                                     {
@@ -1628,7 +1628,7 @@ void initPvpGame()
                                 i3=(mousey()-yy)/zz+1;
                                 j3=(mousex()-xx)/zz+1;
 
-                                if ((i3!=i2 && i3!=i1) || (j3!=i2 && j3!=j1))
+                                if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
                                 {
                                     if (M[i3][j3] == '1')
                                     {
@@ -3840,7 +3840,7 @@ void showOptions()
             if (checkClick(mousex(), mousey(), 460, 480, 268, 284))
             {
                 clearmouseclick(WM_LBUTTONDOWN);
-                if (songNr > 1 && songNr <= 3)
+                if (songNr > 1 && songNr <= 5)
                 {
                     songNr-=1;
                 }
@@ -3859,6 +3859,16 @@ void showOptions()
                     strcpy(songName, "Clandestina - Cocaina");
                     PlaySound(TEXT("songs/clandestina_cocaina.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
                 }
+                else if (songNr == 4)
+                {
+                    strcpy(songName, "Machine Gun Kelly - I think I'm okay");
+                    PlaySound(TEXT("songs/i_think_im_okay.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                }
+                else if (songNr == 5)
+                {
+                    strcpy(songName, "Young T & Bugsey - Don't rush");
+                    PlaySound(TEXT("songs/dont_rush.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                }
                 cleardevice();
                 showOptions();
             }
@@ -3866,7 +3876,7 @@ void showOptions()
             if (checkClick(mousex(), mousey(), 538, 555, 268, 284))
             {
                 clearmouseclick(WM_LBUTTONDOWN);
-                if (songNr >= 1 && songNr < 3)
+                if (songNr >= 1 && songNr < 5)
                 {
                     songNr+=1;
                 }
@@ -3884,6 +3894,16 @@ void showOptions()
                 {
                     strcpy(songName, "Clandestina - Cocaina");
                     PlaySound(TEXT("songs/clandestina_cocaina.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                }
+                else if (songNr == 4)
+                {
+                    strcpy(songName, "Machine Gun Kelly - I think I'm okay");
+                    PlaySound(TEXT("songs/i_think_im_okay.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+                }
+                else if (songNr == 5)
+                {
+                    strcpy(songName, "Young T & Bugsey - Don't rush");
+                    PlaySound(TEXT("songs/dont_rush.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
                 }
 
                 cleardevice();
@@ -4157,6 +4177,5 @@ int main()
 
     showMenu();
 
-    getch();
     return 0;
 }
