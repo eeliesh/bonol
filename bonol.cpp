@@ -45,13 +45,14 @@ void initMediumPvcGame();
 void initHardPvcGame();
 void initOptions();
 void initInfo();
+void undoButton();
 void mutare(short player, short i1, short j1, short i2, short j2, short i3, short j3);
 
 // default language (1 for English, 2 for Romanian or 3 for French)
 short lang=1;
 
 // music is on/off by default
-bool musicOn=1;
+bool musicOn=0;
 
 // default song name and number
 char songName[50] = "Miyagi - Badabum";
@@ -1186,6 +1187,34 @@ void initDifficultyButtons()
     }
 }
 
+void undoButton()
+{
+    short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
+    char undoTxt[10];
+    if (lang == 1)
+    {
+        strcpy(undoTxt, "Undo");
+    }
+    else if (lang == 2)
+    {
+        strcpy(undoTxt, "Refa");
+    }
+    else if (lang == 3)
+    {
+        strcpy(undoTxt, "Ôter");
+    }
+
+    if (checkClick(mousex(), mousey(), xx+10, xx+116, yy+4*zz+50, yy+4*zz+92))
+    {
+        drawButton(xx+10, yy+4*zz+50, 5, itsYellow, itsBg, undoTxt);
+    }
+    else
+    {
+        drawButton(xx+10, yy+4*zz+50, 5, itsBg, itsYellow, undoTxt);
+    }
+    setbkcolor(itsBg);
+}
+
 void moveFirstTxt()
 {
     if (lang == 1)
@@ -1599,7 +1628,7 @@ void initPvpGame()
                                 i2=(mousey()-yy)/zz+1;
                                 j2=(mousex()-xx)/zz+1;
 
-                                if (i2!=1 || j2!=j1)
+                                if (i2!=i1 || j2!=j1)
                                 {
                                     if (M[i2][j2] == '1')
                                     {
@@ -1628,7 +1657,7 @@ void initPvpGame()
                                 i3=(mousey()-yy)/zz+1;
                                 j3=(mousex()-xx)/zz+1;
 
-                                if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
+                                if (i3!=i2 || j3!=j2)
                                 {
                                     if (M[i3][j3] == '1')
                                     {
@@ -1844,7 +1873,9 @@ void initEasyPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short mutari;
-    short in, jn, k1, k2;
+    short in, jn, k1, k2, i, j;
+    bool isRedo=1;
+    char A[6][6];
 
     // display the game table;
     startConfig();
@@ -1911,12 +1942,10 @@ void initEasyPvcGame()
         }
     }
 
-    // go to menu button
-    goToMenu();
-
     while(1)
     {
         cleardevice();
+
         if(player==1)
         {
             // display the it's player's turn text
@@ -1996,9 +2025,9 @@ void initEasyPvcGame()
                 delay(1500);
                 mutare(computer, v[randNr].i1, v[randNr].j1, v[randNr].i2, v[randNr].j2, v[randNr].i3, v[randNr].j3);
                 short neutralPiece = rand() % 3 + 1;
-                for (short i=1; i<=4; i++)
+                for (i=1; i<=4; i++)
                 {
-                    for (short j=1; j<=4; j++)
+                    for (j=1; j<=4; j++)
                     {
                         if (M[i][j] == '0')
                         {
@@ -2038,6 +2067,12 @@ void initEasyPvcGame()
 
                     do
                     {
+                        if (isRedo == 1)
+                        {
+                            delay(50);
+                            undoButton();
+                        }
+
                         if (ismouseclick(WM_LBUTTONDOWN))
                         {
                             if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
@@ -2100,7 +2135,7 @@ void initEasyPvcGame()
                                     i3=(mousey()-yy)/zz+1;
                                     j3=(mousex()-xx)/zz+1;
 
-                                    if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
+                                    if (i3!=i2 || j3!=j2)
                                     {
                                         if (M[i3][j3] == '1')
                                         {
@@ -2125,6 +2160,20 @@ void initEasyPvcGame()
                                         nr--;
                                     }
                                 }
+                            }
+
+                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && isRedo == 1)
+                            {
+                                clearmouseclick(WM_LBUTTONDOWN);
+                                for (i=1; i<=4; i++)
+                                {
+                                    for (j=1; j<=4; j++)
+                                    {
+                                        M[i][j]=A[i][j];
+                                    }
+                                }
+                                isRedo=0;
+                                cleardevice();
                             }
 
                             // go to menu button
@@ -2307,6 +2356,7 @@ void initEasyPvcGame()
                     else
                         break;
                 }
+                isRedo=1;
             }
         }
         player=3-player;
@@ -2579,7 +2629,7 @@ void initMediumPvcGame()
                                     i3=(mousey()-yy)/zz+1;
                                     j3=(mousex()-xx)/zz+1;
 
-                                    if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
+                                    if (i3!=i2 || j3!=j2)
                                     {
                                         if (M[i3][j3] == '1')
                                         {
@@ -3088,7 +3138,7 @@ void initHardPvcGame()
                                     i3=(mousey()-yy)/zz+1;
                                     j3=(mousex()-xx)/zz+1;
 
-                                    if ((i3!=i2 && i3!=i1) || (j3!=j2 && j3!=j1))
+                                    if (i3!=i2 || j3!=j2)
                                     {
                                         if (M[i3][j3] == '1')
                                         {
