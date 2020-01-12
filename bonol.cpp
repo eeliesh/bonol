@@ -31,6 +31,8 @@ bool isChoosing=0;
 bool isChoosingDifficulty=0;
 bool isOptions=0;
 bool isInfo=0;
+bool isFirst=1;
+short nrUndo=3;
 void showMenu();
 void showGameChoosing();
 void showGameDiffChoosing();
@@ -52,7 +54,7 @@ void mutare(short player, short i1, short j1, short i2, short j2, short i3, shor
 short lang=1;
 
 // music is on/off by default
-bool musicOn=0;
+bool musicOn=1;
 
 // default song name and number
 char songName[50] = "Miyagi - Badabum";
@@ -1874,7 +1876,6 @@ void initEasyPvcGame()
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short mutari;
     short in, jn, k1, k2, i, j;
-    bool isRedo=1;
     char A[6][6];
 
     // display the game table;
@@ -2056,6 +2057,16 @@ void initEasyPvcGame()
             }
             else
             {
+                if (nrUndo >= 3)
+                {
+                    for (i=1; i<=4; i++)
+                    {
+                        for (j=1; j<=4; j++)
+                        {
+                            A[i][j]=M[i][j];
+                        }
+                    }
+                }
                 // display the choose squares for new L text
                 clickOnSquareTxt();
 
@@ -2067,7 +2078,7 @@ void initEasyPvcGame()
 
                     do
                     {
-                        if (isRedo == 1)
+                        if (nrUndo >= 3 && isFirst == 0)
                         {
                             delay(50);
                             undoButton();
@@ -2162,7 +2173,7 @@ void initEasyPvcGame()
                                 }
                             }
 
-                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && isRedo == 1)
+                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 3 && isFirst == 0)
                             {
                                 clearmouseclick(WM_LBUTTONDOWN);
                                 for (i=1; i<=4; i++)
@@ -2172,8 +2183,9 @@ void initEasyPvcGame()
                                         M[i][j]=A[i][j];
                                     }
                                 }
-                                isRedo=0;
+                                nrUndo=-1;
                                 cleardevice();
+                                startGame(xx, yy, zz, itsBg);
                             }
 
                             // go to menu button
@@ -2356,7 +2368,8 @@ void initEasyPvcGame()
                     else
                         break;
                 }
-                isRedo=1;
+                nrUndo++;
+                isFirst=0;
             }
         }
         player=3-player;
@@ -3629,6 +3642,8 @@ void initInfo()
 void showMenu()
 {
     initMenu();
+    isFirst=1;
+    nrUndo=3;
 
     do
     {
