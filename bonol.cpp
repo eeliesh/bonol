@@ -71,7 +71,7 @@ DWORD screenHeight = GetSystemMetrics(SM_CYSCREEN);
 struct piesaneutra
 {
     short i, j;
-} stea, diez, liber[15];
+} stea, diez, liber[15],steaA,steaB,diezA,diezB;
 
 struct L
 {
@@ -1876,7 +1876,7 @@ void initEasyPvcGame()
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short mutari;
     short in, jn, k1, k2, i, j;
-    char A[6][6];
+    char A[6][6],B[6][6];
 
     // display the game table;
     startConfig();
@@ -1942,9 +1942,20 @@ void initEasyPvcGame()
             doesntExistTxt();
         }
     }
+    if(player!=computer && isFirst)
+    {
+        for(i=1; i<=4; i++)
+            for(j=1; j<=4; j++)
+                B[i][j]=M[i][j];
+        steaB.i=stea.i;
+        steaB.j=stea.j;
+        diezB.i=diez.i;
+        diezB.j=diez.j;
+    }
 
     while(1)
     {
+undo:
         cleardevice();
 
         if(player==1)
@@ -2003,11 +2014,33 @@ void initEasyPvcGame()
 
             do
             {
-                if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+               if (nrUndo >= 2 && isFirst == 0)
                 {
-                    isMenu=1;
-                    cleardevice();
-                    showMenu();
+                    delay(50);
+                    undoButton();
+                }
+                if(ismouseclick(WM_LBUTTONDOWN))
+                {
+                    if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                    {
+                        isMenu=1;
+                        cleardevice();
+                        showMenu();
+                        clearmouseclick(WM_LBUTTONDOWN);
+                    }
+                    else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 2 && isFirst == 0)
+                    {
+                        clearmouseclick(WM_LBUTTONDOWN);
+                        for (i=1; i<=4; i++)
+                            for (j=1; j<=4; j++)
+                                M[i][j]=B[i][j];
+                        stea.i=steaB.i;
+                        stea.j=steaB.j;
+                        diez.i=diezB.i;
+                        diez.j=diezB.j;
+                        nrUndo=0;
+                        goto undo;
+                    }
                     clearmouseclick(WM_LBUTTONDOWN);
                 }
                 delay(5);
@@ -2054,18 +2087,35 @@ void initEasyPvcGame()
                     diez.i=liber[randChoice].i;
                     diez.j=liber[randChoice].j;
                 }
+                if(isFirst)
+                {
+                    for(i=1; i<=4; i++)
+                        for(j=1; j<=4; j++)
+                            B[i][j]=M[i][j];
+                    steaB.i=stea.i;
+                    steaB.j=stea.j;
+                    diezB.i=diez.i;
+                    diezB.j=diez.j;
+                }
             }
             else
             {
-                if (nrUndo >= 3)
+                if (!isFirst)
                 {
                     for (i=1; i<=4; i++)
-                    {
                         for (j=1; j<=4; j++)
-                        {
-                            A[i][j]=M[i][j];
-                        }
-                    }
+                            A[i][j]=B[i][j];
+                    steaA.i=steaB.i;
+                    steaA.j=steaB.j;
+                    diezA.i=diezB.i;
+                    diezA.j=diezB.j;
+                    for (i=1; i<=4; i++)
+                        for (j=1; j<=4; j++)
+                            B[i][j]=M[i][j];
+                    steaB.i=stea.i;
+                    steaB.j=stea.j;
+                    diezB.i=diez.i;
+                    diezB.j=diez.j;
                 }
                 // display the choose squares for new L text
                 clickOnSquareTxt();
@@ -2078,7 +2128,7 @@ void initEasyPvcGame()
 
                     do
                     {
-                        if (nrUndo >= 3 && isFirst == 0)
+                        if (nrUndo >= 2 && isFirst == 0)
                         {
                             delay(50);
                             undoButton();
@@ -2173,19 +2223,18 @@ void initEasyPvcGame()
                                 }
                             }
 
-                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 3 && isFirst == 0)
+                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 2 && isFirst == 0)
                             {
                                 clearmouseclick(WM_LBUTTONDOWN);
                                 for (i=1; i<=4; i++)
-                                {
                                     for (j=1; j<=4; j++)
-                                    {
                                         M[i][j]=A[i][j];
-                                    }
-                                }
-                                nrUndo=-1;
-                                cleardevice();
-                                startGame(xx, yy, zz, itsBg);
+                                stea.i=steaA.i;
+                                stea.j=steaA.j;
+                                diez.i=diezA.i;
+                                diez.j=diezA.j;
+                                nrUndo=0;
+                                goto undo;
                             }
 
                             // go to menu button
@@ -2368,7 +2417,7 @@ void initEasyPvcGame()
                     else
                         break;
                 }
-                nrUndo++;
+                nrUndo=2;
                 isFirst=0;
             }
         }
@@ -2381,8 +2430,8 @@ void initMediumPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short mutari;
-    short in, jn, k1, k2;
-
+    short in, jn, k1, k2,i,j;
+    char A[6][6],B[6][6];
     // display the game table;
     startConfig();
     startGame(xx, yy, zz, itsBg);
@@ -2445,12 +2494,20 @@ void initMediumPvcGame()
             doesntExistTxt();
         }
     }
-
-    // go to menu button
-    goToMenu();
+    if(player!=computer && isFirst)
+    {
+        for(i=1; i<=4; i++)
+            for(j=1; j<=4; j++)
+                B[i][j]=M[i][j];
+        steaB.i=stea.i;
+        steaB.j=stea.j;
+        diezB.i=diez.i;
+        diezB.j=diez.j;
+    }
 
     while(1)
     {
+undo:
         cleardevice();
         if(player==1)
         {
@@ -2508,11 +2565,33 @@ void initMediumPvcGame()
 
             do
             {
-                if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                if (nrUndo >= 2 && isFirst == 0)
                 {
-                    isMenu=1;
-                    cleardevice();
-                    showMenu();
+                    delay(50);
+                    undoButton();
+                }
+                if(ismouseclick(WM_LBUTTONDOWN))
+                {
+                    if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                    {
+                        isMenu=1;
+                        cleardevice();
+                        showMenu();
+                        clearmouseclick(WM_LBUTTONDOWN);
+                    }
+                    else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 2 && isFirst == 0)
+                    {
+                        clearmouseclick(WM_LBUTTONDOWN);
+                        for (i=1; i<=4; i++)
+                            for (j=1; j<=4; j++)
+                                M[i][j]=B[i][j];
+                        stea.i=steaB.i;
+                        stea.j=steaB.j;
+                        diez.i=diezB.i;
+                        diez.j=diezB.j;
+                        nrUndo=0;
+                        goto undo;
+                    }
                     clearmouseclick(WM_LBUTTONDOWN);
                 }
                 delay(5);
@@ -2566,9 +2645,36 @@ void initMediumPvcGame()
                     diez.i=liber[randChoice].i;
                     diez.j=liber[randChoice].j;
                 }
+                if(isFirst)
+                {
+                    for(i=1; i<=4; i++)
+                        for(j=1; j<=4; j++)
+                            B[i][j]=M[i][j];
+                    steaB.i=stea.i;
+                    steaB.j=stea.j;
+                    diezB.i=diez.i;
+                    diezB.j=diez.j;
+                }
             }
             else
             {
+                if (!isFirst)
+                {
+                    for (i=1; i<=4; i++)
+                        for (j=1; j<=4; j++)
+                            A[i][j]=B[i][j];
+                    steaA.i=steaB.i;
+                    steaA.j=steaB.j;
+                    diezA.i=diezB.i;
+                    diezA.j=diezB.j;
+                    for (i=1; i<=4; i++)
+                        for (j=1; j<=4; j++)
+                            B[i][j]=M[i][j];
+                    steaB.i=stea.i;
+                    steaB.j=stea.j;
+                    diezB.i=diez.i;
+                    diezB.j=diez.j;
+                }
                 // display the choose free squares for the new L text
                 clickOnSquareTxt();
 
@@ -2580,6 +2686,12 @@ void initMediumPvcGame()
 
                     do
                     {
+                        if (nrUndo >= 2 && isFirst == 0)
+                        {
+                            delay(50);
+                            undoButton();
+                        }
+
                         if (ismouseclick(WM_LBUTTONDOWN))
                         {
                             if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
@@ -2667,6 +2779,19 @@ void initMediumPvcGame()
                                         nr--;
                                     }
                                 }
+                            }
+                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 2 && isFirst == 0)
+                            {
+                                clearmouseclick(WM_LBUTTONDOWN);
+                                for (i=1; i<=4; i++)
+                                    for (j=1; j<=4; j++)
+                                        M[i][j]=A[i][j];
+                                stea.i=steaA.i;
+                                stea.j=steaA.j;
+                                diez.i=diezA.i;
+                                diez.j=diezA.j;
+                                nrUndo=0;
+                                goto undo;
                             }
 
                             // go to menu button
@@ -2849,6 +2974,8 @@ void initMediumPvcGame()
                     else
                         break;
                 }
+                nrUndo=2;
+                isFirst=0;
             }
         }
         player=3-player;
@@ -2859,7 +2986,8 @@ void initHardPvcGame()
 {
     short xx=getmaxx()/10, yy=getmaxy()/10-20, zz=getmaxx()/14;
     short mutari;
-    short in, jn, k1, k2;
+    short in, jn, k1, k2,i,j;
+    char A[6][6],B[6][6];
 
     // display the game table;
     startConfig();
@@ -2921,12 +3049,20 @@ void initHardPvcGame()
             doesntExistTxt();
         }
     }
-
-    // go to menu button
-    goToMenu();
+    if(player!=computer && isFirst)
+    {
+        for(i=1; i<=4; i++)
+            for(j=1; j<=4; j++)
+                B[i][j]=M[i][j];
+        steaB.i=stea.i;
+        steaB.j=stea.j;
+        diezB.i=diez.i;
+        diezB.j=diez.j;
+    }
 
     while(1)
     {
+undo:
         cleardevice();
         if(player==1)
         {
@@ -2984,11 +3120,33 @@ void initHardPvcGame()
 
             do
             {
-                if (ismouseclick(WM_LBUTTONDOWN) && checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                if (nrUndo >= 2 && isFirst == 0)
                 {
-                    isMenu=1;
-                    cleardevice();
-                    showMenu();
+                    delay(50);
+                    undoButton();
+                }
+                if(ismouseclick(WM_LBUTTONDOWN))
+                {
+                    if (checkClick(mousex(), mousey(), getmaxx()-150, getmaxx()-50, getmaxy()-80, getmaxy()-60))
+                    {
+                        isMenu=1;
+                        cleardevice();
+                        showMenu();
+                        clearmouseclick(WM_LBUTTONDOWN);
+                    }
+                    else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 2 && isFirst == 0)
+                    {
+                        clearmouseclick(WM_LBUTTONDOWN);
+                        for (i=1; i<=4; i++)
+                            for (j=1; j<=4; j++)
+                                M[i][j]=B[i][j];
+                        stea.i=steaB.i;
+                        stea.j=steaB.j;
+                        diez.i=diezB.i;
+                        diez.j=diezB.j;
+                        nrUndo=0;
+                        goto undo;
+                    }
                     clearmouseclick(WM_LBUTTONDOWN);
                 }
                 delay(5);
@@ -3075,9 +3233,36 @@ void initHardPvcGame()
                     diez.i=liberDiez[imin].i;
                     diez.j=liberDiez[imin].j;
                 }
+                if(isFirst)
+                {
+                    for(i=1; i<=4; i++)
+                        for(j=1; j<=4; j++)
+                            B[i][j]=M[i][j];
+                    steaB.i=stea.i;
+                    steaB.j=stea.j;
+                    diezB.i=diez.i;
+                    diezB.j=diez.j;
+                }
             }
             else
             {
+                if (!isFirst)
+                {
+                    for (i=1; i<=4; i++)
+                        for (j=1; j<=4; j++)
+                            A[i][j]=B[i][j];
+                    steaA.i=steaB.i;
+                    steaA.j=steaB.j;
+                    diezA.i=diezB.i;
+                    diezA.j=diezB.j;
+                    for (i=1; i<=4; i++)
+                        for (j=1; j<=4; j++)
+                            B[i][j]=M[i][j];
+                    steaB.i=stea.i;
+                    steaB.j=stea.j;
+                    diezB.i=diez.i;
+                    diezB.j=diez.j;
+                }
                 // display the choose L squares text
                 clickOnSquareTxt();
 
@@ -3089,6 +3274,12 @@ void initHardPvcGame()
 
                     do
                     {
+                        if (nrUndo >= 2 && isFirst == 0)
+                        {
+                            delay(50);
+                            undoButton();
+                        }
+
                         if (ismouseclick(WM_LBUTTONDOWN))
                         {
                             if (checkClick(mousex(), mousey(), xx, xx+4*zz, yy, yy+4*zz))
@@ -3176,6 +3367,19 @@ void initHardPvcGame()
                                         nr--;
                                     }
                                 }
+                            }
+                            else if (checkClick(mousex(), mousey(), xx+10, xx+136, yy+4*zz+50, yy+4*zz+92) && nrUndo >= 2 && isFirst == 0)
+                            {
+                                clearmouseclick(WM_LBUTTONDOWN);
+                                for (i=1; i<=4; i++)
+                                    for (j=1; j<=4; j++)
+                                        M[i][j]=A[i][j];
+                                stea.i=steaA.i;
+                                stea.j=steaA.j;
+                                diez.i=diezA.i;
+                                diez.j=diezA.j;
+                                nrUndo=0;
+                                goto undo;
                             }
 
                             // go to menu button
@@ -3360,6 +3564,8 @@ void initHardPvcGame()
                     else
                         break;
                 }
+                nrUndo=2;
+                isFirst=0;
             }
         }
         player=3-player;
@@ -3593,7 +3799,7 @@ void initInfo()
         char info7Ro[] = "   Piesele nu trebuie sa se suprapuna sau sa acopere alte piese. La mutarea piesei L, aceasta este";
         char info8Ro[] = "ridicata si mai apoi plasata in patratele libere undeva pe tabla. Aceasta poate fi rotita sau chiar";
         char info9Ro[] = "rasturnata in acest sens. Singura regula este ca piesa trebuie sa se termine intr-o pozitie diferita";
-        char info10Ro[] = "fata de cea de inceput - acopering astfel cel putin un patrat acoperit anterior. Pentru a muta piesa";
+        char info10Ro[] = "fata de cea de inceput, acoperind astfel cel putin un patrat neacoperit anterior. Pentru a muta piesa";
         char info11Ro[] = "neutra, un jucator pur si simplu o ridica, iar mai apoi o plaseaza intr-un patrat liber de pe tabla.";
 
         outtextxy(120, 200, info1Ro);
@@ -3643,7 +3849,7 @@ void showMenu()
 {
     initMenu();
     isFirst=1;
-    nrUndo=3;
+    nrUndo=1;
 
     do
     {
@@ -4226,7 +4432,6 @@ void showInfo()
 
 int main()
 {
-
     if (musicOn)
     {
         PlaySound(TEXT("songs/miyagi_badabum.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
