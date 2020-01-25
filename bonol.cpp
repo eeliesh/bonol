@@ -3,6 +3,7 @@
 #include <cstring>
 #include <windows.h>
 #include <mmsystem.h>
+#include <time.h>
 
 using namespace std;
 
@@ -4432,6 +4433,7 @@ void showInfo()
 
 int main()
 {
+    srand(time(NULL));
     if (musicOn)
     {
         PlaySound(TEXT("songs/miyagi_badabum.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
